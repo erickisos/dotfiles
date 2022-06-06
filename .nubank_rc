@@ -1,6 +1,3 @@
 [[ -s ~/.nurc ]] && source $HOME/.nurc
 [[ -s ~/.nubank_aliases ]] && source $HOME/.nubank_aliases
-
-if [[ -d "$NU_HOME" ]]; then
-    export PATH="$PATH:$NU_HOME/nucli.py/bin"
-fi
+[[ -d "$NU_HOME/nucli.py/bin"]] && export PATH="$PATH:$NU_HOME/nucli.py/bin"
