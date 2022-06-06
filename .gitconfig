@@ -1,7 +1,6 @@
 [user]
 	name = Erick G. Islas-Osuna
 	email = erickisos653@gmail.com
-	signingkey = 95CD2097762D4C86
 [core]
 	editor = nvim
 [commit]
@@ -12,6 +11,7 @@
 	branch = auto
 	status = auto
 [alias]
+	nb = "!new_branch() { git checkout -b \"$1\" }; new_branch"
 	tree = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an, %cr)%Creset' --abbrev-commit --date=relative
 [url "git@github.com:"]
 	insteadOf = https://github.com/
