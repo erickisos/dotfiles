@@ -2,7 +2,7 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 (setq  user-full-name                 "Erick G. Islas Osuna"
-       user-mail-address              "erick@tliwaka.com.mx"
+       user-mail-address              "erickisos653@gmail.com"
        doom-theme                     'doom-one
        org-directory                  "~/Documents/Cloud/Notes/"
        display-line-numbers-type      t
@@ -36,6 +36,19 @@
                                         ("st" . "schema.test")
                                         ("m" . "matcher-combinators.matchers")
                                         ("pp" . "clojure.pprint"))))
+
+(use-package! lsp-mode
+  :commands lsp
+  :config
+  (setq lsp-headerline-breadcrumb-enable   t
+        lsp-lens-enable                    t
+        lsp-signature-render-documentation nil
+        lsp-semantic-tokens-enable         t
+        lsp-idle-delay                     0.1
+        lsp-ui-sideline-enable             nil
+        lsp-completion-use-last-result     nil)
+  (advice-add #'lsp-rename
+              :after (fn (&rest _) (projectile-save-project-buffers))))
 
 (use-package! clojure-mode
   :config
