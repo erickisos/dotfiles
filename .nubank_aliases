@@ -1,0 +1,5 @@
+alias nrt="nu-mx auth get-refresh-token --env prod"
+alias nrts="nu-mx auth get-refresh-token --env staging"
+alias ngt="nu-mx auth get-access-token --env prod"
+alias ngts="nu-mx auth get-access-token --env staging"
+alias orm="nu-mx aws credentials refresh --okta"

@@ -1,0 +1,18 @@
+cdp() {
+    cd "$NU_HOME/$1"
+}
+
+clone() {
+    nu proj clone $1
+    cdp $1
+}
+
+watch-ser() {
+    # $1 is the prototype and $2 is the service-name
+    watch nu-mx k8s ctl $1 --env prod --country mx -- get pods -l nubank.com.br/name=$2
+}
+
+cycle() {
+    # $1 is the prototype and $2 is the service-name
+    nu-mx k8s cycle $1 $2
+}
