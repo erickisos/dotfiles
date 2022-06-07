@@ -1,17 +1,17 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-(setq  user-full-name                 "Erick G. Islas Osuna"
-       user-mail-address              "erickisos653@gmail.com"
-       doom-theme                     'doom-one
-       org-directory                  "~/Documents/Cloud/Notes/"
-       display-line-numbers-type      t
-       projectile-project-search-path '("~/Documents/Github")
-       evil-split-window-below        t
-       evil-vsplit-window-right       t
-       doom-font                      (font-spec :family "Fira Code" :size 12)
-       doom-themes-treemacs-theme     "all-the-icons"
-       ispell-dictionary              "es")
+(setq user-full-name                 "Erick G. Islas Osuna"
+      user-mail-address              "erickisos653@gmail.com"
+      doom-theme                     'doom-one
+      org-directory                  "~/Documents/Cloud/Notes/"
+      display-line-numbers-type      t
+      projectile-project-search-path '("~/Documents/Github")
+      evil-split-window-below        t
+      evil-vsplit-window-right       t
+      doom-font                      (font-spec :family "Fira Code" :size 12)
+      doom-themes-treemacs-theme     "all-the-icons"
+      ispell-dictionary              "es")
 
 (use-package! treemacs-all-the-icons
   :after treemacs)
@@ -43,12 +43,11 @@
   (setq lsp-headerline-breadcrumb-enable   t
         lsp-lens-enable                    t
         lsp-signature-render-documentation nil
-        lsp-semantic-tokens-enable         t
         lsp-idle-delay                     0.1
         lsp-ui-sideline-enable             nil
         lsp-completion-use-last-result     nil)
   (advice-add #'lsp-rename
-              :after (fn (&rest _) (projectile-save-project-buffers))))
+              :after (lambda (&rest _) (projectile-save-project-buffers))))
 
 (use-package! clojure-mode
   :config
@@ -100,5 +99,11 @@
         org-tree-slide-skip-outline-level    2
         org-tree-slide-modeline-display      'outside
         org-tree-slide-fold-subtrees-skipped nil))
+
+(use-package! company-tabnine
+  :config
+  (add-to-list 'company-backends #'company-tabnine)
+  (setq company-idle-delay        0
+        company-show-quick-access t))
 
 (load! "nubank")

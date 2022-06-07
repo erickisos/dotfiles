@@ -2,7 +2,7 @@ plugins=(git sudo docker aws brew npm)
 
 ZSH_THEME="simple"
 
-source $ZSH/oh-my-zsh.sh
+[[ -s $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
 [[ -s $HOME/.zsh_aliases ]] && source $HOME/.zsh_aliases
 
 if [[ -d $NU_HOME ]]; then
