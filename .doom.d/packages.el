@@ -24,3 +24,4 @@
 ;; Spice
 (package! spice-mode)
 (package! ob-spice)
+(package! company-tabnine)
