@@ -1,0 +1,99 @@
+#+TITLE: Personal configuration
+
+* Main environment configuration
+This is the main file for all the personal configurations that should set the needed env-vars.
+
+#+begin_src shell :tangle ../.env
+export GPG_TTY=$(tty)
+export XTERM=xterm-24bit
+#+end_src
+
+We are working directly with ZSH, so the next line would import the oh-my-zsh configuration
+#+begin_src shell :tangle ../.env
+export ZSH="$HOME/.oh-my-zsh/"
+#+end_src
+
+Now we need to add the main sources for binary files
+#+begin_src shell :tangle ../.env
+export PATH="$PATH:$HOME/.emacs.d/bin"
+export PATH="$PATH:$HOMEBREW_PREFIX/bin"
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.dotnet/tools"
+#+end_src
+
+Also, to have scala tooling
+#+begin_src shell :tangle ../.env
+export SCALA_HOME="$PATH:$HOMEBREW_PREFIX/opt/scala"
+#+end_src
+
+The definition of the main Hunter Root
+#+begin_src shell :tangle ../.env
+export HUNTER_ROOT="$HOME/.hunter"
+#+end_src
+
+Also, the main files would include the definitions of locales
+#+begin_src shell :tangle ../.env
+export LANG="en_US"
+export LC_ALL="en_US.UTF-8"
+export LC_CTYPE="en_US.UTF-8"
+#+end_src
+
+Finally, we need the main requirements that would help us to import only the needed files depending on which environment are we using currently
+#+begin_src shell :tangle ../.env
+[ -s "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+fpath=(~/.zsh/completion $fpath)
+
+[ -n "$NU_HOME" ] && . "$HOME/.nubank_env"
+#+end_src
+
+* Main zshrc file
+The main RC file includes the specific zsh configuration
+#+begin_src shell :tangle ../.zshrc
+plugins=(git sudo docker aws brew npm)
+ZSH_THEME="simple"
+#+end_src
+
+also, one important part is to start requesting the other configurations that would be interesting to use depending on the environment
+
+#+begin_src shell :tangle ../.zshrc
+[[ -s $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
+[[ -s $HOME/.zsh_aliases ]] && source $HOME/.zsh_aliases
+
+if [[ -d $NU_HOME ]]; then
+    [[ -s $HOME/.nubank_rc ]] && source $HOME/.nubank_rc
+    [[ -s $HOME/.nubank_aliases ]] && source $HOME/.nubank_aliases
+fi
+#+end_src
+
+Conda is one of our main tools, so this is the appropiate config
+#+begin_src shell :tangle ../.zshrc
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('$HOME/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "$HOME/opt/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/opt/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="$HOME/opt/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+#+end_src
+
+Now to add the autoload feature
+#+begin_src shell :tangle ../.zshrc
+autoload -Uz compinit ; compinit
+#+end_src
+
+* Main Aliases
+
+The next is the list of the main aliases that we have for every environment
+#+begin_src shell :tangle ../.zsh_aliases
+alias emacsc="emacsclient -c -a 'emacs'"
+#+end_src

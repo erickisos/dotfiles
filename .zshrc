@@ -1,5 +1,4 @@
 plugins=(git sudo docker aws brew npm)
-
 ZSH_THEME="simple"
 
 [[ -s $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
