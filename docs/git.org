@@ -1,3 +1,11 @@
+#+TITLE: Git
+
+This file includes the main configuration for Git at a machine level, it would generate the =.gitconfig= file.
+
+* Personal information
+The next cell includes only the personal information and preferences
+
+#+begin_src gitconfig :tangle ../.gitconfig
 [user]
     name = Erick G. Islas-Osuna
     email = erickisos653@gmail.com
@@ -5,7 +13,10 @@
     editor = nvim
 [github]
     user = erickisos
+#+end_src
 
+General configurations just to enforce best practices
+#+begin_src gitconfig :tangle ../.gitconfig
 [commit]
     gpgsign = true
 [gpg]
@@ -22,3 +33,4 @@
     rebase = false
 [push]
     default = simple
+#+end_src
