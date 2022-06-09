@@ -6,7 +6,7 @@ Main configuration files for my shared Unix/macOS system
 
 The basic structure is the same that you would find on your home directory:
 
-- =.doom.d= contains all the doom emacs configurations
+- [[org:docs/doom.org][Doom Config file]] contains all the doom emacs configurations in a literate programming manner
 - =.zshrc= is the main config file for ZShell
 - =.env= is a general envvar file
 - =.gitconfig= contains my global configuration for Git
