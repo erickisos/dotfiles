@@ -9,4 +9,4 @@ The basic structure is the same that you would find on your home directory:
 - [[docs/doom.org][Doom Config file]] contains all the doom emacs configurations in a literate programming manner
 - [[file:docs/nubank.org][Nubank Config file]] contains the specific nubank configurations that would lead into these files: =.nubank_env=, =.nubank_rc=, =.nubank_aliases= and =.nubank_functions=
 - [[file:docs/main.org][Main Config file]] is the owner of the main configurations for the general shell environment, this means that it includes all th ZSH configurations, =.env=, =.zshrc=, =.zsh_functions=, =.zsh_aliases=.
-- =.gitconfig= contains my global configuration for Git
+- [[file:docs/git.org][Git Config file]] includes all the main configurations for the global git state.
