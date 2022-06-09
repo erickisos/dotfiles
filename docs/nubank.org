@@ -1,0 +1,178 @@
+#+title: Nubank
+
+* Environment
+On nubank we use many custom tools, so it is pretty amazing to have the option to start working directly with minimal scripts that would give us access to the whole ecosystem, maybe this shouldn't be here in an org-mode file (mainly because is auto-generated code) but just for the sake of having a simplified manage, let's create the main env-vars directly in here.
+
+The main variables are related to the location of the tooling and projects:
+#+begin_src shell :tangle ../.nubank_env
+export NU_HOME="$HOME/dev/nu"
+export NUCLI_HOME="$NU_HOME/nucli"
+#+end_src
+
+which for instance should be included in the main path of the computer
+#+begin_src shell :tangle ../.nubank_env
+export PATH="$NUCLI_HOME:$PATH"
+#+end_src
+
+Also we have some tooling related to Golang
+#+begin_src shell :tangle ../.nubank_env
+export GOPATH="$HOME/go"
+export PATH="$GOPATH/bin:$PATH"
+#+end_src
+
+Just to be sure, we have three new blocks, one for NVM, one for android and one for RBenv
+#+begin_src shell :tangle ../.nubank_env
+export NVM_DIR="$HOME/.nvm"
+[ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && . "$(brew --prefix)/opt/nvm/nvm.sh"
+#+end_src
+
+The one for android
+#+begin_src shell :tangle ../.nubank_env
+export ANDROID_HOME="/Users/erick.islas/Library/Android/sdk"
+export ANDROID_SDK="$ANDROID_HOME"
+export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator"
+#+end_src
+
+The block for RBenv
+#+begin_src shell :tangle ../.nubank_env
+eval "$(rbenv init -)"
+#+end_src
+
+And given that we are working on the mobile side of the env-vars, it would be great to just add the main monorepo variables and the flutter vars.
+#+begin_src shell :tangle ../.nubank_env
+export MONOREPO_ROOT="${NU_HOME}/mini-meta-repo"
+export PATH="$PATH:$MONOREPO_ROOT/monocli/bin"
+
+export FLUTTER_SDK_HOME="$HOME/sdk-flutter"
+export FLUTTER_ROOT="$FLUTTER_SDK_HOME"
+export PATH="$PATH:$FLUTTER_SDK_HOME/bin:$HOME/.pub-cache/bin:$FLUTTER_ROOT/bin/cache/dart-sdk/bin"
+#+end_src
+
+* Main RC file
+
+Even when we already defined some variables it seems that a good practice is to start defining which files should be loaded only if they have some valuable configuration
+
+#+begin_src shell :tangle ../.nubank_rc
+[[ -s $HOME/.nurc ]] && source $HOME/.nurc
+[[ -s $HOME/.nubank_aliases ]] && source $HOME/.nubank_aliases
+[[ -s $HOME/.nubank_functions ]] && source $HOME/.nubank_functions
+#+end_src
+
+Let's add the other nucli tools too, just in case that we could have that project cloned
+#+begin_src shell :tangle ../.nubank_rc
+[[ -d "$NU_HOME/nucli.py/bin"]] && export PATH="$PATH:$NU_HOME/nucli.py/bin"
+#+end_src
+
+if we have those included, that implies that we already have the nu projects and some nubank specific env-vars, for instance this would work:
+#+begin_src shell :tangle ../.nubank_rc
+# <-- BEGIN SECTION ADDED BY NUDEV -->
+
+# To handle non-ASCII characters
+# ==============================
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US.UTF-8"
+
+
+# Programs
+# ========
+
+# Default editor
+# --------------
+export EDITOR="subl -w -n"
+
+# Homebrew
+# --------
+if command -v brew >/dev/null ; then
+  HOMEBREW_PREFIX="$(brew --prefix)"
+  export PATH="${HOMEBREW_PREFIX}/sbin:${PATH}"
+elif [[ -f "/opt/homebrew/bin/brew" && $(/usr/bin/uname -sm) == "Darwin arm64" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+  export PATH="${HOMEBREW_PREFIX}/sbin:${PATH}"
+fi
+
+# SDKMAN
+# ------
+if [[ -f "$HOME/.sdkman/bin/sdkman-init.sh" && $(/usr/bin/uname -sm) == "Darwin arm64" ]]; then
+  source "$HOME/.sdkman/bin/sdkman-init.sh"
+fi
+
+# jEnv
+# ----
+if command -v jenv >/dev/null; then
+  export PATH="${HOME}/.jenv/bin:${PATH}"
+  eval "$(jenv init -)"
+fi
+
+# rbenv
+# -----
+if command -v rbenv >/dev/null; then eval "$(rbenv init -)"; fi
+
+# node
+# ----
+# https://nodejs.org/api/modules.html
+if command -v node >/dev/null && [[ -n "$HOMEBREW_PREFIX" ]]; then
+  export NODE_PATH="${HOMEBREW_PREFIX}/lib/node_modules"
+fi
+
+# Autocomplete
+# ============
+
+# https://docs.brew.sh/Shell-Completion
+if command -v brew >/dev/null && [[ $(ps -p "$$" -o comm=) == *bash ]]; then
+
+  case $- in
+  *e*) set_e=true && set +e ;;
+  *) set_e=false ;;
+  esac
+
+  for completion_file in "${HOMEBREW_PREFIX}/etc/bash_completion.d"/*; do
+    source "${completion_file}"
+  done
+
+  # bash-completion@2
+  if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+    . "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" || :
+  fi
+
+  [[ "${set_e}" == true ]] && set -e
+
+fi
+
+if [[ -r "${NUCLI_HOME}/nu.bashcompletion" ]]; then
+  . "${NUCLI_HOME}/nu.bashcompletion" || :
+fi
+
+# <-- END SECTION ADDED BY NUDEV -->
+#+end_src
+
+* Aliases and functions
+There are some actions that are performed too often, so it is way better if we can define some specific aliases that would help us to avoid the mind load that would represent memorizing all of those commands:
+#+begin_src shell :tangle ../.nubank_aliases
+alias nrt="nu-mx auth get-refresh-token --env prod"
+alias nrts="nu-mx auth get-refresh-token --env staging"
+alias ngt="nu-mx auth get-access-token --env prod"
+alias ngts="nu-mx auth get-access-token --env staging"
+alias orm="nu-mx aws credentials refresh --okta"
+#+end_src
+
+And that implies too, that it would be pretty great to have custom functions (with parameters) to execute another common actions
+#+begin_src shell :tangle ../.nubank_functions
+cdp() {
+    cd "$NU_HOME/$1"
+}
+
+clone() {
+    nu proj clone $1
+    cdp $1
+}
+
+watch-ser() {
+    # $1 is the prototype and $2 is the service-name
+    watch nu-mx k8s ctl $1 --env prod --country mx -- get pods -l nubank.com.br/name=$2
+}
+
+cycle() {
+    # $1 is the prototype and $2 is the service-name
+    nu-mx k8s cycle $1 $2
+}
+#+end_src
