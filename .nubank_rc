@@ -2,9 +2,7 @@
 [[ -s $HOME/.nubank_aliases ]] && source $HOME/.nubank_aliases
 [[ -s $HOME/.nubank_functions ]] && source $HOME/.nubank_functions
 
-if [[ -d "$NU_HOME/nucli.py/bin" ]]; then
-    export PATH="$PATH:$NU_HOME/nucli.py/bin"
-fi
+[[ -d "$NU_HOME/nucli.py/bin"]] && export PATH="$PATH:$NU_HOME/nucli.py/bin"
 
 # <-- BEGIN SECTION ADDED BY NUDEV -->
 
