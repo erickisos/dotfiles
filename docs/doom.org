@@ -1,6 +1,15 @@
+#+title: Doom Configuration
+
+This file contains all the specific doom configuration in a literate programming manner, this means that the code writted here is the one that would be used by default to autogenerate all the emacs config files.
+
+First of all, we define the main preference which is in the way of how do I prefer having my emacs window when is recently opened, in this case the line is:
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+end_src
 
+The next code-block incluldes my default config for the main details, my identity on this computer and the location of basic projects
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
 (setq user-full-name                 "Erick G. Islas Osuna"
       user-mail-address              "erickisos653@gmail.com"
       doom-theme                     'doom-one
@@ -12,7 +21,26 @@
       doom-font                      (font-spec :family "Fira Code" :size 12)
       doom-themes-treemacs-theme     "all-the-icons"
       ispell-dictionary              "es")
+#+end_src
 
+And given that we are already using this weird thing called =doom-themes-treemacs= this would be the best starting point to present my main packages.
+
+#+begin_src emacs-lisp :tangle ../.doom.d/packages.el
+;; -*- no-byte-compile: t; -*-
+;;; $DOOMDIR/packages.el
+(package! treemacs-all-the-icons)
+#+end_src
+
+also, just to avoid having all versions of related packages we have this configuration
+#+begin_src emacs-lisp :tangle ../.doom.d/packages.el
+(unpin! treemacs)
+(unpin! lsp-ui)
+(unpin! lsp-mode)
+(unpin! lsp-treemacs)
+#+end_src
+
+going back into the config, we have the next lines, which would set main features for treemacs and lsp-mode
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
 (use-package! treemacs-all-the-icons
   :after treemacs)
 
@@ -38,7 +66,31 @@
 (use-package! lsp-treemacs
   :config
   (setq lsp-treemacs-error-list-current-project-only t))
+#+end_src
 
+the next steps are the packages needed to handle some extra minor modes
+#+begin_src emacs-lisp :tangle ../.doom.d/packages.el
+(package! paredit)
+(package! posframe)
+(package! scss-mode)
+(package! company-quickhelp)
+
+(unpin! hover)
+(unpin! lsp-dart)
+
+(package! lsp-metals)
+(package! map :pin "bb50dba")
+(package! company-tabnine)
+#+end_src
+
+The next section is to add support of spice directly on org-mode
+#+begin_src emacs-lisp :tangle ../.doom.d/packages.el
+(package! spice-mode)
+(package! ob-spice)
+#+end_src
+
+as you can see, we have some new packages around metals, dart and tabnine, so we need to define some extra configurations on the doom side
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
 (use-package! clojure-mode
   :config
   (setq clojure-indent-style 'align-arguments))
@@ -102,4 +154,9 @@
   (setq company-idle-delay        0
         company-show-quick-access t))
 
+#+end_src
+
+And last but not least, given that we are actively moving between a personal computer and the Nubank computer, I've added the next line to the main config.
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
 (load! "nubank")
+#+end_src
