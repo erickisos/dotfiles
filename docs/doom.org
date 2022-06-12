@@ -180,9 +180,6 @@ Here we have the main configurations for ERC (default Emacs IRC client)
       erc-fill-static-center      16)
 #+end_src
 
-#+RESULTS:
-: 16
-
 * Nubank Config file
 
 And last but not least, given that we are actively moving between a personal computer and the Nubank computer, I've added the next line to the main config.
