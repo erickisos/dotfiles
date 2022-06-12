@@ -153,8 +153,37 @@ as you can see, we have some new packages around metals, dart and tabnine, so we
   (add-to-list 'company-backends #'company-tabnine)
   (setq company-idle-delay        0
         company-show-quick-access t))
-
 #+end_src
+
+* ERC
+
+Here we have the main configurations for ERC (default Emacs IRC client)
+
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
+(map! :leader
+      (:prefix ("e" . "evaluate/ERC/EWW")
+       :desc "Launch ERC with TLS connection" "E" #'erc-tls))
+
+(setq erc-prompt                  (lambda () (concat "[" (buffer-name) "]"))
+      erc-server                  "irc.libera.chat"
+      erc-nick                    "erickisos"
+      erc-user-full-name          "Erick Isos"
+      erc-track-shorten-start     24
+      erc-autojoin-channels-alist '(("irc.libera.chat"
+                                     "#archlinux"
+                                     "#linux"
+                                     "#emacs"
+                                     "#pyar"))
+      erc-kill-buffer-on-part     t
+      erc-fill-column             100
+      erc-fill-function           'erc-fill-static
+      erc-fill-static-center      16)
+#+end_src
+
+#+RESULTS:
+: 16
+
+* Nubank Config file
 
 And last but not least, given that we are actively moving between a personal computer and the Nubank computer, I've added the next line to the main config.
 #+begin_src emacs-lisp :tangle ../.doom.d/config.el
