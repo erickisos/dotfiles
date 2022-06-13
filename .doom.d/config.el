@@ -117,7 +117,7 @@
                                      "#emacs"
                                      "#pyar"))
       erc-kill-buffer-on-part     t
-      erc-fill-column             100
+      erc-fill-column             200
       erc-fill-function           'erc-fill-static
       erc-fill-static-center      16)
 
