@@ -21,3 +21,5 @@
 
 (package! spice-mode)
 (package! ob-spice)
+
+(package! telega)
