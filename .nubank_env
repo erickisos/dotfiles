@@ -1,4 +1,6 @@
 export NU_HOME="$HOME/dev/nu"
+export NU_COUNTRY="mx"
+export NU_ENV="prod"
 export NUCLI_HOME="$NU_HOME/nucli"
 
 export PATH="$NUCLI_HOME:$PATH"
