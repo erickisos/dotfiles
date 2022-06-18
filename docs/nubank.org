@@ -6,6 +6,8 @@ On nubank we use many custom tools, so it is pretty amazing to have the option t
 The main variables are related to the location of the tooling and projects:
 #+begin_src shell :tangle ../.nubank_env
 export NU_HOME="$HOME/dev/nu"
+export NU_COUNTRY="mx"
+export NU_ENV="prod"
 export NUCLI_HOME="$NU_HOME/nucli"
 #+end_src
 
@@ -60,7 +62,9 @@ Even when we already defined some variables it seems that a good practice is to 
 
 Let's add the other nucli tools too, just in case that we could have that project cloned
 #+begin_src shell :tangle ../.nubank_rc
-[[ -d "$NU_HOME/nucli.py/bin"]] && export PATH="$PATH:$NU_HOME/nucli.py/bin"
+if [[ -d "$NU_HOME/nucli.py/bin" ]]; then
+    export PATH="$PATH:$NU_HOME/nucli.py/bin"
+fi
 #+end_src
 
 if we have those included, that implies that we already have the nu projects and some nubank specific env-vars, for instance this would work:
