@@ -9,10 +9,18 @@ clone() {
 
 watch-ser() {
     # $1 is the prototype and $2 is the service-name
-    watch nu-mx k8s ctl $1 --env prod --country mx -- get pods -l nubank.com.br/name=$2
+    watch -n 2 nu-mx k8s get pods $1 $2
 }
 
 cycle() {
     # $1 is the prototype and $2 is the service-name
     nu-mx k8s cycle $1 $2
+}
+
+last-image() {
+    nu-mx registry list-images nu-$1 | sed -n 2p | cut -d ' ' -f1
+}
+
+redeploy() {
+    nu-mx service rainmaker update $1 $2 $(last-image $2)
 }
