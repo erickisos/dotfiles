@@ -186,3 +186,25 @@ And last but not least, given that we are actively moving between a personal com
 #+begin_src emacs-lisp :tangle ../.doom.d/config.el
 (load! "nubank")
 #+end_src
+
+* Testing (Maybe dashboard)
+
+#+begin_src emacs-lisp :tangle ../.doom.d/packages.el
+(package! dashboard)
+#+end_src
+
+Our main configuration
+
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
+(use-package! dashboard
+  :init
+  (setq dashboard-set-heading-icons t
+        dashboard-set-file-icons    t
+        dashboard-center-content    t
+        dashboard-set-navigator     t)
+  :config
+  (setq dashboard-startup-banner "~/.dotfiles/logo.png")
+  (dashboard-setup-startup-hook))
+
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+#+end_src

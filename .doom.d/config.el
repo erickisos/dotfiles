@@ -121,9 +121,16 @@
       erc-fill-function           'erc-fill-static
       erc-fill-static-center      16)
 
-(use-package! telega
-  :config
-  (setq telega-use-images t
-        telega-emoji-use-images t))
-
 (load! "nubank")
+
+(use-package! dashboard
+  :init
+  (setq dashboard-set-heading-icons t
+        dashboard-set-file-icons    t
+        dashboard-center-content    t
+        dashboard-set-navigator     t)
+  :config
+  (setq dashboard-startup-banner "~/.dotfiles/logo.png")
+  (dashboard-setup-startup-hook))
+
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
