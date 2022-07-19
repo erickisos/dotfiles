@@ -11,7 +11,7 @@ export PATH="$GOPATH/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && . "$(brew --prefix)/opt/nvm/nvm.sh"
 
-export ANDROID_HOME="/Users/erick.islas/Library/Android/sdk"
+export ANDROID_HOME="$HOME/Library/Android/sdk"
 export ANDROID_SDK="$ANDROID_HOME"
 export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator"
 
