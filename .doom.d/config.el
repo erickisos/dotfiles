@@ -121,9 +121,4 @@
       erc-fill-function           'erc-fill-static
       erc-fill-static-center      16)
 
-(use-package! telega
-  :config
-  (setq telega-use-images t
-        telega-emoji-use-images t))
-
 (load! "nubank")
