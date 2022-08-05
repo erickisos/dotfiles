@@ -52,7 +52,7 @@ fpath=(~/.zsh/completion $fpath)
 Also I will add the Nubank env file
 #+begin_src shell :tangle ../.env
 export NU_HOME="$HOME/dev/nu"
-[ -n "$NU_HOME" ] && . "$HOME/.nubank_env"
+[ -d "$NU_HOME" ] && . "$HOME/.nubank_env"
 #+end_src
 
 * Main zshrc file

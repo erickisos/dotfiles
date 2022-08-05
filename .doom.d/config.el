@@ -9,7 +9,7 @@
       projectile-project-search-path '("~/Documents/Github")
       evil-split-window-below        t
       evil-vsplit-window-right       t
-      doom-font                      (font-spec :family "Fira Code" :size 12)
+      doom-font                      (font-spec :family "Fira Code" :size 11)
       doom-themes-treemacs-theme     "all-the-icons"
       ispell-dictionary              "es")
 
