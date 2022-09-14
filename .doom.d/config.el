@@ -121,4 +121,5 @@
       erc-fill-function           'erc-fill-static
       erc-fill-static-center      16)
 
+(load! "functions")
 (load! "nubank")
