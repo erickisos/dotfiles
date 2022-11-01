@@ -11,14 +11,21 @@ fi
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('$HOME/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_name=""
+if [[ -d "$HOME/miniforge3" ]]; then
+    __conda_name="miniforge3"
+elif [[ -d "$HOME/mambaforge" ]]; then
+    __conda_name="mambaforge"
+fi
+
+__conda_setup="$('$HOME/${__conda_name}/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "$HOME/miniforge3/etc/profile.d/conda.sh"
+    if [ -f "$HOME/${__conda_name}/etc/profile.d/conda.sh" ]; then
+        . "$HOME/${__conda_name}/etc/profile.d/conda.sh"
     else
-        export PATH="$HOME/miniforge3/bin:$PATH"
+        export PATH="$HOME/${__conda_name}/bin:$PATH"
     fi
 fi
 unset __conda_setup

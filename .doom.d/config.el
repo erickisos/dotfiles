@@ -138,4 +138,6 @@
         :desc "Prev untranslated entry" "U" #'po-previous-untranslated-entry
         :desc "Edit msgstr in separated buffer" "e" #'po-edit-msgstr))
 
+(load! "functions")
+
 (load! "nubank")
