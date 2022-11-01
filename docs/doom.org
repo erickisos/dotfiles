@@ -180,6 +180,39 @@ Here we have the main configurations for ERC (default Emacs IRC client)
       erc-fill-static-center      16)
 #+end_src
 
+* CV Generator for Org Mode
+
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
+
+(use-package ox-moderncv
+  :load-path "~/Documents/Github/org-cv/"
+  :init (require 'ox-moderncv))
+#+end_src
+
+* Po Mode para editar archivos de traducción
+
+Po-mode is the package needed to work with translation files (from gettext).
+
+#+begin_src emacs-lisp :tangle ../.doom.d/packages.el
+(package! po-mode)
+#+end_src
+
+The next cell includes my custom keyboard preferences for that mode.
+
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
+(use-package! po-mode
+  :config
+  (setq auto-mode-alist (cons '("\\.po\\'\\|\\.po\\." . po-mode) auto-mode-alist))
+  (map! :map po-mode-map
+        :localleader
+        :desc "Go to next entry" "n" #'po-next-entry
+        :desc "Go to prev entry" "N" #'po-previous-entry
+        :desc "Next fuzzy entry" "f" #'po-next-fuzzy-entry
+        :desc "Prev fuzzy entry" "F" #'po-previous-fuzzy-entry
+        :desc "Next untranslated entry" "u" #'po-next-untranslated-entry
+        :desc "Prev untranslated entry" "U" #'po-previous-untranslated-entry
+        :desc "Edit msgstr in separated buffer" "e" #'po-edit-msgstr))
+
 * Some general utils for emacs
 
 I frequently find myself executing =uuidgen= in the terminal in order to acquire random uuids, so I think it would be better if we can use this directly in emacs and being able to insert the result in the current buffer
@@ -226,6 +259,7 @@ I frequently find myself executing =uuidgen= in the terminal in order to acquire
 
 #+begin_src emacs-lisp :tangle ../.doom.d/config.el
 (load! "functions")
+
 #+end_src
 
 * Nubank Config file

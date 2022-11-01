@@ -121,6 +121,23 @@
       erc-fill-function           'erc-fill-static
       erc-fill-static-center      16)
 
+(use-package ox-moderncv
+  :load-path "~/Documents/Github/org-cv/"
+  :init (require 'ox-moderncv))
+
+(use-package! po-mode
+  :config
+  (setq auto-mode-alist (cons '("\\.po\\'\\|\\.po\\." . po-mode) auto-mode-alist))
+  (map! :map po-mode-map
+        :localleader
+        :desc "Go to next entry" "n" #'po-next-entry
+        :desc "Go to prev entry" "N" #'po-previous-entry
+        :desc "Next fuzzy entry" "f" #'po-next-fuzzy-entry
+        :desc "Prev fuzzy entry" "F" #'po-previous-fuzzy-entry
+        :desc "Next untranslated entry" "u" #'po-next-untranslated-entry
+        :desc "Prev untranslated entry" "U" #'po-previous-untranslated-entry
+        :desc "Edit msgstr in separated buffer" "e" #'po-edit-msgstr))
+
 (load! "functions")
 
 (load! "nubank")
