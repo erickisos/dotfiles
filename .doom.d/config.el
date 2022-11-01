@@ -122,7 +122,7 @@
       erc-fill-static-center      16)
 
 (use-package ox-moderncv
-  :load-path "/Users/erickisos/Documents/Github/org-cv/"
+  :load-path "~/Documents/Github/org-cv/"
   :init (require 'ox-moderncv))
 
 (use-package! po-mode

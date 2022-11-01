@@ -185,7 +185,7 @@ Here we have the main configurations for ERC (default Emacs IRC client)
 #+begin_src emacs-lisp :tangle ../.doom.d/config.el
 
 (use-package ox-moderncv
-  :load-path "/Users/erickisos/Documents/Github/org-cv/"
+  :load-path "~/Documents/Github/org-cv/"
   :init (require 'ox-moderncv))
 #+end_src
 
