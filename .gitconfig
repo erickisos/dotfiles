@@ -22,3 +22,5 @@
     rebase = false
 [push]
     default = simple
+[init]
+	defaultBranch = main

@@ -51,16 +51,19 @@ going back into the config, we have the next lines, which would set main feature
         lsp-lens-enable                    t
         lsp-signature-render-documentation nil
         lsp-idle-delay                     0.1
-        lsp-ui-sideline-enable             nil
+        lsp-ui-sideline-enable             t
         lsp-completion-use-last-result     nil)
   (advice-add #'lsp-rename
-              :after (lambda (&rest _) (projectile-save-project-buffers))))
+              :after (lambda (&rest _) (projectile-save-project-buffers)))
+  (add-hook 'lsp-after-open-hook
+            (lambda () (when (lsp-find-workspace 'rust-analyzer nil)
+                                              (lsp-rust-analyzer-inlay-hints-mode)))))
 
 (use-package! lsp-ui
   :after lsp-mode
   :commands lsp-ui-mode
   :config
-  (setq lsp-ui-doc-enable  nil
+  (setq lsp-ui-doc-enable  t
         lsp-ui-peek-enable nil))
 
 (use-package! lsp-treemacs
@@ -89,7 +92,7 @@ The next section is to add support of spice directly on org-mode
 (package! ob-spice)
 #+end_src
 
-as you can see, we have some new packages around metals, dart and tabnine, so we need to define some extra configurations on the doom side
+As you can see, we have some new packages around metals, dart and tabnine, so we need to define some extra configurations on the doom side
 #+begin_src emacs-lisp :tangle ../.doom.d/config.el
 (use-package! clojure-mode
   :config
@@ -220,7 +223,8 @@ I frequently find myself executing =uuidgen= in the terminal in order to acquire
 #+begin_src emacs-lisp :tangle ../.doom.d/functions.el
 (defun generate-random-uuid ()
   "Insert a UUID.
-   This commands calls “uuidgen” on MacOS, Linux, and calls PowelShell on Microsoft Windows.
+   This commands calls “uuidgen” on MacOS, Linux, and calls PowerShell
+   on Microsoft Windows.
    URL `http://xahlee.info/emacs/emacs/elisp_generate_uuid.html'
    Version 2020-06-04"
   (cond ((string-equal system-type "windows-nt")

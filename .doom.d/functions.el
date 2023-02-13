@@ -1,6 +1,7 @@
 (defun generate-random-uuid ()
   "Insert a UUID.
-   This commands calls “uuidgen” on MacOS, Linux, and calls PowelShell on Microsoft Windows.
+   This commands calls “uuidgen” on MacOS, Linux, and calls PowelShell
+   on Microsoft Windows.
    URL `http://xahlee.info/emacs/emacs/elisp_generate_uuid.html'
    Version 2020-06-04"
   (cond ((string-equal system-type "windows-nt")

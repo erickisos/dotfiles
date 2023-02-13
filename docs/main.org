@@ -104,6 +104,20 @@ Now to add the autoload feature
 autoload -Uz compinit ; compinit
 #+end_src
 
+#+begin_src shell :tangle ../.zshrc
+export PATH="/opt/homebrew/opt/icu4c/bin:$PATH"
+export PATH="/opt/homebrew/opt/icu4c/sbin:$PATH"
+export PATH="$HOME/bin:$PATH"
+#+end_src
+
+* Add SDKMan support
+
+#+begin_src shell :tangel ../.zshrc
+# THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+#+end_src
+
 * Main Aliases
 
 The next is the list of the main aliases that we have for every environment

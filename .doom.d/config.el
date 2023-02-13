@@ -6,7 +6,8 @@
       doom-theme                     'doom-one
       org-directory                  "~/Documents/Cloud/Notes/"
       display-line-numbers-type      t
-      projectile-project-search-path '("~/Documents/Github")
+      projectile-project-search-path '("~/Documents/Github"
+                                       "~/Documents/Proyectos")
       evil-split-window-below        t
       evil-vsplit-window-right       t
       doom-font                      (font-spec :family "Fira Code" :size 11)
@@ -26,7 +27,9 @@
         lsp-ui-sideline-enable             nil
         lsp-completion-use-last-result     nil)
   (advice-add #'lsp-rename
-              :after (lambda (&rest _) (projectile-save-project-buffers))))
+              :after (lambda (&rest _) (projectile-save-project-buffers)))
+  (add-hook 'lsp-after-open-hook (lambda () (when (lsp-find-workspace 'rust-analyzer nil)
+                                         (lsp-rust-analyzer-inlay-hints-mode)))))
 
 (use-package! lsp-ui
   :after lsp-mode
@@ -43,13 +46,13 @@
   :config
   (setq clojure-indent-style 'align-arguments))
 
-(use-package! company
-  :init
-  (company-quickhelp-mode)
-  :config
-  (setq company-quickhelp-delay                nil
-        company-quickhelp-use-propertized-text t
-        company-quickhelp-max-lines            10))
+;; (use-package! company
+;;   :init
+;;   (company-quickhelp-mode)
+;;   :config
+;;   (setq company-quickhelp-delay                nil
+;;         company-quickhelp-use-propertized-text t
+;;         company-quickhelp-max-lines            10))
 
 (use-package! lsp-dart
   :after dart-mode
@@ -117,7 +120,7 @@
                                      "#emacs"
                                      "#pyar"))
       erc-kill-buffer-on-part     t
-      erc-fill-column             200
+      erc-fill-column             80
       erc-fill-function           'erc-fill-static
       erc-fill-static-center      16)
 
@@ -127,7 +130,6 @@
 
 (use-package! po-mode
   :config
-  (setq auto-mode-alist (cons '("\\.po\\'\\|\\.po\\." . po-mode) auto-mode-alist))
   (map! :map po-mode-map
         :localleader
         :desc "Go to next entry" "n" #'po-next-entry
@@ -139,5 +141,3 @@
         :desc "Edit msgstr in separated buffer" "e" #'po-edit-msgstr))
 
 (load! "functions")
-
-(load! "nubank")

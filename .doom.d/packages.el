@@ -6,11 +6,12 @@
 (unpin! lsp-ui)
 (unpin! lsp-mode)
 (unpin! lsp-treemacs)
+(unpin! cython-mode)
 
 (package! paredit)
 (package! posframe)
 (package! scss-mode)
-(package! company-quickhelp)
+;; (package! company-quickhelp)
 
 (unpin! hover)
 (unpin! lsp-dart)
@@ -19,7 +20,7 @@
 (package! map :pin "bb50dba")
 (package! company-tabnine)
 
-(package! spice-mode)
-(package! ob-spice)
+;; (package! spice-mode)
+;; (package! ob-spice)
 
 (package! po-mode)

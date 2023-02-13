@@ -1,0 +1,5 @@
+- host: localhost
+  connection: local
+  roles:
+    - role: homebrew
+      tags: [foundation, package-and-build, homebrew]

@@ -13,6 +13,8 @@ The next cell includes only the personal information and preferences
     editor = nvim
 [github]
     user = erickisos
+[init]
+	defaultBranch = main
 #+end_src
 
 General configurations just to enforce best practices
