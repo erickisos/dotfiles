@@ -99,12 +99,6 @@
         org-tree-slide-modeline-display      'outside
         org-tree-slide-fold-subtrees-skipped nil))
 
-(use-package! company-tabnine
-  :config
-  (add-to-list 'company-backends #'company-tabnine)
-  (setq company-idle-delay        0
-        company-show-quick-access t))
-
 (map! :leader
       (:prefix ("e" . "evaluate/ERC/EWW")
        :desc "Launch ERC with TLS connection" "E" #'erc-tls))

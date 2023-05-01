@@ -18,7 +18,6 @@
 
 (package! lsp-metals)
 (package! map :pin "bb50dba")
-(package! company-tabnine)
 
 ;; (package! spice-mode)
 ;; (package! ob-spice)
