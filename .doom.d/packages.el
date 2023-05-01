@@ -18,9 +18,12 @@
 
 (package! lsp-metals)
 (package! map :pin "bb50dba")
-(package! company-tabnine)
 
 ;; (package! spice-mode)
 ;; (package! ob-spice)
 
-(package! po-mode)
+(package! po-mode
+  :recipe (:host github :repo "erickisos/po-mode" :files ("*.el" "Makefile")))
+
+(package! copilot
+   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))

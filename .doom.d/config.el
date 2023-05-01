@@ -99,12 +99,6 @@
         org-tree-slide-modeline-display      'outside
         org-tree-slide-fold-subtrees-skipped nil))
 
-(use-package! company-tabnine
-  :config
-  (add-to-list 'company-backends #'company-tabnine)
-  (setq company-idle-delay        0
-        company-show-quick-access t))
-
 (map! :leader
       (:prefix ("e" . "evaluate/ERC/EWW")
        :desc "Launch ERC with TLS connection" "E" #'erc-tls))
@@ -139,5 +133,12 @@
         :desc "Next untranslated entry" "u" #'po-next-untranslated-entry
         :desc "Prev untranslated entry" "U" #'po-previous-untranslated-entry
         :desc "Edit msgstr in separated buffer" "e" #'po-edit-msgstr))
+
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<M-RET>" . 'copilot-accept-completion)
+              ("<M-enter>" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
 (load! "functions")
