@@ -190,7 +190,8 @@ Here we have the main configurations for ERC (default Emacs IRC client)
 Po-mode is the package needed to work with translation files (from gettext).
 
 #+begin_src emacs-lisp :tangle ../.doom.d/packages.el
-(package! po-mode)
+(package! po-mode
+  :recipe (:host github :repo "erickisos/po-mode" :files ("*.el" "Makefile")))
 #+end_src
 
 The next cell includes my custom keyboard preferences for that mode.
