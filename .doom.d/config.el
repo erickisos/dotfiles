@@ -140,4 +140,11 @@
         :desc "Prev untranslated entry" "U" #'po-previous-untranslated-entry
         :desc "Edit msgstr in separated buffer" "e" #'po-edit-msgstr))
 
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<M-RET>" . 'copilot-accept-completion)
+              ("<M-enter>" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
 (load! "functions")

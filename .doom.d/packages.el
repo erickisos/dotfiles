@@ -24,3 +24,5 @@
 ;; (package! ob-spice)
 
 (package! po-mode)
+(package! copilot
+   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))

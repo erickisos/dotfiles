@@ -83,7 +83,6 @@ the next steps are the packages needed to handle some extra minor modes
 
 (package! lsp-metals)
 (package! map :pin "bb50dba")
-(package! company-tabnine)
 #+end_src
 
 The next section is to add support of spice directly on org-mode
@@ -92,7 +91,7 @@ The next section is to add support of spice directly on org-mode
 (package! ob-spice)
 #+end_src
 
-As you can see, we have some new packages around metals, dart and tabnine, so we need to define some extra configurations on the doom side
+As you can see, we have some new packages around metals, and dart, so we need to define some extra configurations on the doom side
 #+begin_src emacs-lisp :tangle ../.doom.d/config.el
 (use-package! clojure-mode
   :config
@@ -150,12 +149,6 @@ As you can see, we have some new packages around metals, dart and tabnine, so we
         org-tree-slide-slide-in-effect       t
         org-tree-slide-modeline-display      'outside
         org-tree-slide-fold-subtrees-skipped nil))
-
-(use-package! company-tabnine
-  :config
-  (add-to-list 'company-backends #'company-tabnine)
-  (setq company-idle-delay        0
-        company-show-quick-access t))
 #+end_src
 
 * ERC
@@ -258,6 +251,23 @@ I frequently find myself executing =uuidgen= in the terminal in order to acquire
   (interactive)
   (insert (downcase (replace-regexp-in-string "\n$" "" (generate-random-uuid)))))
 #+end_src
+
+* Github Copilot
+
+This is the main config to enable Github Copilot in Doom emacs. I've been using it for a while and it's impressive.
+
+#+begin_src emacs-lisp :tangle ../.doom.d/packages.el
+(package! copilot
+  :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+#+end_src
+
+#+begin_src emacs-lisp :tangle ../.doom.d/config.el
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+  ("<M-RET>" . 'copilot-accept-completion)))
+#+end_src
+
 
 * Load the general utils file
 
