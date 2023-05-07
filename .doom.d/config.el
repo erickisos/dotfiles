@@ -7,7 +7,7 @@
       org-directory                  "~/Documents/Cloud/Notes/"
       display-line-numbers-type      t
       projectile-project-search-path '("~/Documents/Github"
-                                       "~/Documents/Proyectos")
+                                       "~/Documents/Projects")
       evil-split-window-below        t
       evil-vsplit-window-right       t
       doom-font                      (font-spec :family "Fira Code" :size 11)
@@ -29,7 +29,7 @@
   (advice-add #'lsp-rename
               :after (lambda (&rest _) (projectile-save-project-buffers)))
   (add-hook 'lsp-after-open-hook (lambda () (when (lsp-find-workspace 'rust-analyzer nil)
-                                         (lsp-rust-analyzer-inlay-hints-mode)))))
+                                              (lsp-rust-analyzer-inlay-hints-mode)))))
 
 (use-package! lsp-ui
   :after lsp-mode
@@ -118,9 +118,7 @@
       erc-fill-function           'erc-fill-static
       erc-fill-static-center      16)
 
-(use-package ox-moderncv
-  :load-path "~/Documents/Github/org-cv/"
-  :init (require 'ox-moderncv))
+(use-package! ox-moderncv)
 
 (use-package! po-mode
   :config

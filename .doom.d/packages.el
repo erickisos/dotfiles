@@ -27,3 +27,7 @@
 
 (package! copilot
    :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+
+(package! docker-tramp)
+(package! ox-moderncv
+    :recipe (:host github :repo "erickisos/org-cv" :files ("*.el")))
