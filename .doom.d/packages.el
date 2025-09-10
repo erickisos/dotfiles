@@ -1,3 +1,4 @@
+;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el -*- lexical-binding: t; -*-
 
 (unpin! treemacs)
@@ -25,3 +26,14 @@
 
 (unpin! lsp-mode)
 (unpin! lsp-ui)
+
+(package! gradle-mode
+  :recipe (:host github :repo "erickisos/emacs-gradle-mode" :files ("*.el" "Makefile")))
+
+(package! obsidian)
+
+(package! why-this
+  :recipe (:host github :repo "erickisos/emacs-why-this" :files ("*.el" "Makefile")))
+
+(package! pulsing-cursor
+  :recipe (:host github :repo "jasonjckn/pulsing-cursor"))
