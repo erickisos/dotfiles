@@ -1,5 +1,17 @@
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+#+title: Doomemacs Config
 
+* Lexical Binding for our config files
+#+begin_src emacs-lisp
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+#+end_src
+
+#+begin_src emacs-lisp :tangle packages.el
+;;; $DOOMDIR/packages.el -*- lexical-binding: t; -*-
+#+end_src
+
+* Basic Variables for normal usage
+
+#+begin_src emacs-lisp
 (setq user-full-name                    "Erick G. Islas Osuna"
       user-mail-address                 "erick@tliwaka.com.mx"
       doom-theme                        'doom-molokai
@@ -21,7 +33,31 @@
       evil-split-window-below           t
       doom-font                         (font-spec :family "Fira Code" :size 12)
       display-line-numbers-type         'relative)
+#+end_src
 
+* Packages
+
+#+begin_src emacs-lisp :tangle packages.el
+(unpin! treemacs)
+(unpin! lsp-treemacs)
+(unpin! lsp-ui)
+(unpin! lsp-mode)
+#+end_src
+
+#+begin_src emacs-lisp :tangle packages.el
+
+(package! treemacs-all-the-icons)
+(package! scss-mode)
+(package! lsp-metals)
+#+end_src
+
+* Po Mode for Docs Translation
+#+begin_src emacs-lisp :tangle packages.el
+(package! po-mode
+  :recipe (:host github :repo "erickisos/po-mode" :files ("*.el" "Makefile")))
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package! po-mode
   :config
   (map! :map po-mode-map
@@ -33,7 +69,18 @@
         :desc "Next untranslated entry" "u" #'po-next-untranslated-entry
         :desc "Prev untranslated entry" "U" #'po-previous-untranslated-entry
         :desc "Edit msgstr in separated buffer" "e" #'po-edit-msgstr))
+#+end_src
+* OX Modern CV
 
+#+begin_src emacs-lisp :tangle packages.el
+(package! ox-moderncv
+  :recipe (:host github :repo "erickisos/org-cv" :files ("*.el")))
+#+end_src
+
+
+* Tree Slide (Slideshow for Geeks?)
+
+#+begin_src emacs-lisp
 (use-package! org-tree-slide
   :after org-mode
   :config
@@ -42,11 +89,46 @@
   (map! :map org-tree-slide-mode-map
         :desc "Next slide" "M-n" #'org-tree-slide-move-next-tree
         :desc "Prev slide" "M-p" #'org-tree-slide-move-previous-tree))
+#+end_src
 
+* Github Copilot (ECA)
+
+This is the main config to enable ECA
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! eca
+  :recipe (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
+#+end_src
+
+* Github Copilot (Aider  fP)
+This is a temporary measure to enable Github Copilot using =copilot.el= while I enable this through ECA.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
+#+end_src
+
+
+* Paredit for those who love parentheses
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! paredit)
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package! paredit
   :hook ((clojure-mode . paredit-mode)
          (emacs-lisp-mode . paredit-mode)))
+#+end_src
 
+* LSP Configurations
+
+#+begin_src emacs-lisp :tangle packages.el
+(unpin! lsp-mode)
+(unpin! lsp-ui)
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package! lsp-mode
   :commands lsp
   :config
@@ -55,9 +137,14 @@
         lsp-lens-enable                  t)
   (advice-add #'lsp-rename
               :after (lambda (&rest _) (projectile-save-project-buffers))))
+#+end_src
 
+* Rust Specific configurations
+
+#+begin_src emacs-lisp
 (after! lsp-mode
   :config
   (setq lsp-rust-analyzer-display-chaining-hints            t
         lsp-rust-analyzer-display-closure-return-type-hints t
         lsp-rust-analyzer-display-parameter-hints           t))
+#+end_src
