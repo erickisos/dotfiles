@@ -1,5 +1,5 @@
 plugins=(git sudo docker aws brew npm)
-ZSH_THEME="simple"
+ZSH_THEME="robbyrussell"
 
 [[ -s $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
 [[ -s $HOME/.zsh_aliases ]] && source $HOME/.zsh_aliases

@@ -55,6 +55,8 @@
         :desc "Next slide" "M-n" #'org-tree-slide-move-next-tree
         :desc "Prev slide" "M-p" #'org-tree-slide-move-previous-tree))
 
+(use-package! eca)
+
 (use-package! paredit
   :hook ((clojure-mode . paredit-mode)
          (emacs-lisp-mode . paredit-mode)))
@@ -114,7 +116,6 @@
 (use-package! obsidian
   :config
   (global-obsidian-mode t)
-  (obsidian-backlinks-mode t)
   :custom
   (obsidian-directory "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/ObsNotes")
   (obsidian-daily-notes-directory "Daily"))
@@ -130,31 +131,9 @@
   :config
   (pulsing-cursor-mode +1))
 
-(use-package! magit
+(use-package! codesnap
   :config
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
-  )
-
-(use-package! gptel
-  :ensure t
-  :defer t
-  :config
-  (setq gptel-backend (gptel-make-openai "Netflix Model Gateway"
-                        :host "mgp.local.dev.netflix.net:9123"
-                        :endpoint (gptel-make-netflix-mg-endpoint "eislasosunaws")
-                        :protocol "http"
-                        :models '(gpt-5
-                                  gpt-4.1
-                                  o4-mini
-                                  gpt-4o
-                                  gemini-2.5-pro
-                                  gemini-2.5-flash
-                                  bedrock/anthropic.claude-sonnet-4-20250514-v1:0
-                                  bedrock/anthropic.claude-opus-4-1-20250805-v1:0))
-        gptel-model   'bedrock/anthropic.claude-sonnet-4-20250514-v1:0)
-  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
-  (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
-  :custom
-  (gptel-prompt-prefix-string "> ")
-  (gptel-response-prefix-string "🤖 "))
+  (map! :localleader
+        :prefix "CodeSnap" "S"
+        :desc "Screenshot selected code" "S x" #'codesnap-selection
+        :desc "Show CodeSnap log" "S l" #'codesnap-show-log))
