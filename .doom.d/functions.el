@@ -6,6 +6,3 @@
 
 (defun add-project-directories (&rest paths)
   (seq-filter #'directory-path-p paths))
-
-(defun gptel-make-netflix-mg-endpoint (workspace-name)
-  (format "/proxy/%s/v1/chat/completions" workspace-name))

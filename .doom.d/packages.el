@@ -1,10 +1,10 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el -*- lexical-binding: t; -*-
 
-(unpin! treemacs)
-(unpin! lsp-treemacs)
-(unpin! lsp-ui)
-(unpin! lsp-mode)
+;; (unpin! treemacs)
+;; (unpin! lsp-treemacs)
+;; (unpin! lsp-ui)
+;; (unpin! lsp-mode)
 
 (package! treemacs-all-the-icons)
 (package! scss-mode)
@@ -37,3 +37,6 @@
 
 (package! pulsing-cursor
   :recipe (:host github :repo "jasonjckn/pulsing-cursor"))
+
+(package! codesnap
+  :recipe (:host github :repo "erickisos/codesnap.el" :files ("*.el")))

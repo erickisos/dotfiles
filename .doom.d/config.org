@@ -59,10 +59,10 @@ Load the defined functions into main config.el
 * Packages
 
 #+begin_src emacs-lisp :tangle packages.el
-(unpin! treemacs)
-(unpin! lsp-treemacs)
-(unpin! lsp-ui)
-(unpin! lsp-mode)
+;; (unpin! treemacs)
+;; (unpin! lsp-treemacs)
+;; (unpin! lsp-ui)
+;; (unpin! lsp-mode)
 #+end_src
 
 #+begin_src emacs-lisp :tangle packages.el
@@ -122,6 +122,10 @@ This is the main config to enable ECA
 #+begin_src emacs-lisp :tangle packages.el
 (package! eca
   :recipe (:host github :repo "editor-code-assistant/eca-emacs" :files ("*.el")))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! eca)
 #+end_src
 
 * Github Copilot (Aider  fP)
@@ -241,7 +245,6 @@ Before using Obsidian through Emacs, it's also neccessary to mark the iCloud fol
 (use-package! obsidian
   :config
   (global-obsidian-mode t)
-  (obsidian-backlinks-mode t)
   :custom
   (obsidian-directory "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/ObsNotes")
   (obsidian-daily-notes-directory "Daily"))
@@ -276,43 +279,22 @@ Before using Obsidian through Emacs, it's also neccessary to mark the iCloud fol
   (pulsing-cursor-mode +1))
 #+end_src
 
-* Magit Customization
-#+begin_src emacs-lisp
-(use-package! magit
-  :config
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
-  )
+* CodeSnap Integration
+
+The codesnap package is now a separate file that gets loaded.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! codesnap
+  :recipe (:host github :repo "erickisos/codesnap.el" :files ("*.el")))
 #+end_src
 
-* Netflix Related Configurations
-
-#+begin_src emacs-lisp :tangle functions.el
-(defun gptel-make-netflix-mg-endpoint (workspace-name)
-  (format "/proxy/%s/v1/chat/completions" workspace-name))
-#+end_src
+Keybindings for codesnap
 
 #+begin_src emacs-lisp
-(use-package! gptel
-  :ensure t
-  :defer t
+(use-package! codesnap
   :config
-  (setq gptel-backend (gptel-make-openai "Netflix Model Gateway"
-                        :host "mgp.local.dev.netflix.net:9123"
-                        :endpoint (gptel-make-netflix-mg-endpoint "eislasosunaws")
-                        :protocol "http"
-                        :models '(gpt-5
-                                  gpt-4.1
-                                  o4-mini
-                                  gpt-4o
-                                  gemini-2.5-pro
-                                  gemini-2.5-flash
-                                  bedrock/anthropic.claude-sonnet-4-20250514-v1:0
-                                  bedrock/anthropic.claude-opus-4-1-20250805-v1:0))
-        gptel-model   'bedrock/anthropic.claude-sonnet-4-20250514-v1:0)
-  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
-  (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
-  :custom
-  (gptel-prompt-prefix-string "> ")
-  (gptel-response-prefix-string "🤖 "))
+  (map! :localleader
+        :prefix "CodeSnap" "S"
+        :desc "Screenshot selected code" "S x" #'codesnap-selection
+        :desc "Show CodeSnap log" "S l" #'codesnap-show-log))
 #+end_src

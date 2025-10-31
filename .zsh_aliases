@@ -1,1 +1,1 @@
-alias emacsc="emacsclient -c -a 'emacs'"
+alias emacsc="emacsclient -c -a ''"
