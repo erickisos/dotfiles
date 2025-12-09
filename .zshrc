@@ -1,13 +1,11 @@
 plugins=(git sudo docker aws brew npm)
-ZSH_THEME="robbyrussell"
+# ZSH_THEME="robbyrussell"
+PROMPT='${ret_status}%{$fg_bold[green]%}%p %{$fg[cyan]%}%c %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%} %D %T % %{$reset_color%}'
 
 [[ -s $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
 [[ -s $HOME/.zsh_aliases ]] && source $HOME/.zsh_aliases
 
-if [[ -d $NU_HOME ]]; then
-    [[ -s $HOME/.nubank_rc ]] && source $HOME/.nubank_rc
-    [[ -s $HOME/.nubank_aliases ]] && source $HOME/.nubank_aliases
-fi
+HIST_STAMPS="%Y-%m-%d %H:%M:%S"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -18,7 +16,7 @@ elif [[ -d "$HOME/mambaforge" ]]; then
     __conda_name="mambaforge"
 fi
 
-__conda_setup="$('$HOME/${__conda_name}/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('$HOME/${__conda_name}/bin/conda' 'shell.zsh' 'hook' 2>/dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
@@ -31,7 +29,9 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-autoload -Uz compinit ; compinit
+autoload -Uz compinit
+compinit
+
 export PATH="/opt/homebrew/opt/icu4c/bin:$PATH"
 export PATH="/opt/homebrew/opt/icu4c/sbin:$PATH"
 export PATH="$HOME/bin:$PATH"
