@@ -6,14 +6,13 @@
 # Do not remove the below line. The metatron CLI uses it to update this file.
 ##### END METATRON AUTOCONFIG
 [user]
-	name = Erick G. Islas-Osuna
-	email = erickisos653@gmail.com
+    name = Erick G. Islas-Osuna
+    email = erickisos653@gmail.com
+    signingkey = B0A89DCFDD29EFD4645F157495CD2097762D4C86
 [core]
-  editor = nvim
-  excludesfile = /Users/erickisos/.gitignore_global
+    editor = emacsclient -c -a ''
 [github]
     user = erickisos
-
 [commit]
     gpgsign = true
 [gpg]
