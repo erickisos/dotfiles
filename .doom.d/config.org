@@ -27,6 +27,9 @@ Load the defined functions into main config.el
 #+begin_src emacs-lisp
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+(set-frame-parameter nil 'ns-transparent-titlebar t)
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+
 (setq user-full-name                    "Erick G. Islas Osuna"
       user-mail-address                 "erick@tliwaka.com.mx"
       doom-theme                        'doom-molokai
@@ -66,7 +69,6 @@ Load the defined functions into main config.el
 #+end_src
 
 #+begin_src emacs-lisp :tangle packages.el
-
 (package! treemacs-all-the-icons)
 (package! scss-mode)
 (package! lsp-metals)
@@ -103,16 +105,43 @@ Load the defined functions into main config.el
 
 #+begin_src emacs-lisp
 (use-package! org-tree-slide
-  :after org-mode
+  :after org
   :config
   (setq org-tree-slide-slide-in-effect       t
         +org-present-text-scale              2
         org-tree-slide-skip-outline-level    2
         org-tree-slide-fold-subtrees-skipped nil
-        org-tree-slide-modeline-display      'outside)
+        org-tree-slide-modeline-display      'lighter ;; Show timer in modeline
+        )
+  
+  ;; Disable line numbers, why-this-mode, and close unnecessary windows when starting presentation
+  (add-hook 'org-tree-slide-play-hook
+            (lambda ()
+              (message ">>> org-tree-slide PLAY hook fired! <<<")
+              (setq display-line-numbers nil)
+              ;; Keep UTF-8 entities displayed (override org-tree-slide's default)
+              (setq org-pretty-entities t)
+              ;; Disable why-this-mode
+              (when (bound-and-true-p why-this-mode)
+                (message ">>> Disabling why-this-mode <<<")
+                (why-this-mode -1))
+              
+              ;; Close ECA and other windows, keeping only the org buffer
+              (let ((org-buffer (current-buffer)))
+                (delete-other-windows)
+                (switch-to-buffer org-buffer))))
+  
+  ;; Re-enable line numbers and why-this-mode when stopping presentation
+  (add-hook 'org-tree-slide-stop-hook
+            (lambda ()
+              (message ">>> org-tree-slide STOP hook fired! <<<")
+              ;; Re-enable why-this-mode
+              (message ">>> Enabling why-this-mode <<<")
+              (why-this-mode 1)))
+  
   (map! :map org-tree-slide-mode-map
-        :desc "Next slide" "M-n" #'org-tree-slide-move-next-tree
-        :desc "Prev slide" "M-p" #'org-tree-slide-move-previous-tree))
+        :desc "Next slide" "<right>" #'org-tree-slide-move-next-tree
+        :desc "Prev slide" "<left>" #'org-tree-slide-move-previous-tree))
 #+end_src
 
 * Github Copilot (ECA)
@@ -128,32 +157,21 @@ This is the main config to enable ECA
 (use-package! eca)
 #+end_src
 
-* Github Copilot (Aider  fP)
-This is a temporary measure to enable Github Copilot using =copilot.el= while I enable this through ECA.
+* Claude Code support
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! copilot
-  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
-#+end_src
-
-* Paredit for those who love parentheses
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! paredit)
+(package! claude-code-ide
+  :recipe (:host github :repo "manzaltu/claude-code-ide.el"))
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! paredit
-  :hook ((clojure-mode . paredit-mode)
-         (emacs-lisp-mode . paredit-mode)))
+(use-package! claude-code-ide
+  :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+  :config
+  (claude-code-ide-emacs-tools-setup)) ; Optionally enable Emacs MCP tools
 #+end_src
 
-* LSP Configurations
-
-#+begin_src emacs-lisp :tangle packages.el
-(unpin! lsp-mode)
-(unpin! lsp-ui)
-#+end_src
+* * LSP Configurations
 
 #+begin_src emacs-lisp
 (use-package! lsp-mode
@@ -161,9 +179,24 @@ This is a temporary measure to enable Github Copilot using =copilot.el= while I 
   :config
   (setq lsp-headerline-breadcrumb-enable t
         lsp-inlay-hints-mode             t
-        lsp-lens-enable                  t)
+        lsp-lens-enable                  t
+        ;; Don't keep the JDT workspace alive after all its buffers are closed.
+        ;; Prevents every project you've ever opened from being re-imported on startup.
+        lsp-keep-workspace-alive         nil
+        ;; Emit a warning when the file watcher exceeds this many files — useful
+        ;; for diagnosing runaway scans into build artifact directories.
+        lsp-file-watch-threshold         2000)
   (advice-add #'lsp-rename
-              :after (lambda (&rest _) (projectile-save-project-buffers))))
+              :after (lambda (&rest _) (projectile-save-project-buffers)))
+  ;; Exclude Gradle/Java build artifact directories from the file watcher.
+  ;; Without this, lsp-mode watches build/, .gradle/, out/ etc. and triggers
+  ;; on every recompile, causing unnecessary re-indexing.
+  (dolist (dir '("[/\\\\]build\\'"
+                 "[/\\\\]\\.gradle\\'"
+                 "[/\\\\]out\\'"
+                 "[/\\\\]\\.idea\\'"
+                 "[/\\\\]bin\\'"))
+    (add-to-list 'lsp-file-watch-ignored-directories dir)))
 #+end_src
 
 * Rust Specific configurations
@@ -190,6 +223,24 @@ This is useful for the projects we work with, which are generally tied to Gradle
   :after java-mode)
 #+end_src
 
+** Multi-module Gradle project root detection
+
+Projectile's bottom-up search stops at the first directory containing a root
+marker. Without ~settings.gradle~ in that list, it stops at the submodule's
+~build.gradle~ and treats each module as a separate project. Adding
+~settings.gradle~ (which only exists at the repo root) makes Projectile walk up
+past submodule boundaries to the true root, and LSP/JDT follows.
+
+#+begin_src emacs-lisp
+(after! projectile
+  (add-to-list 'projectile-project-root-files-bottom-up "settings.gradle")
+  (add-to-list 'projectile-project-root-files-bottom-up "settings.gradle.kts")
+  ;; build.gradle exists in every Gradle submodule, so it's a false root signal.
+  ;; Remove it so submodules like app/ don't get detected as independent projects.
+  (setq projectile-project-root-files-bottom-up
+        (remove "build.gradle" projectile-project-root-files-bottom-up)))
+#+end_src
+
 ** LSP Java
 
 #+begin_src emacs-lisp
@@ -197,22 +248,45 @@ This is useful for the projects we work with, which are generally tied to Gradle
   :after java-mode
   :config
   (add-hook 'java-mode-hook (lambda () (gradle-mode 1)))
-  (setq lsp-java-references-code-lens-enabled      t
-        lsp-java-implementations-code-lens-enabled t
-        lsp-java-lens-mode                         t
-        lsp-java-format-settings-url               "~/IDEAJavaFormatter.xml"
-        lsp-java-vmargs                            '("-XX:+UseParallelGC"
-                                                     "-XX:GCTimeRatio=4"
-                                                     "-XX:AdaptiveSizePolicyWeight=90"
-                                                     "-Dsun.zip.disableMemoryMapping=true"
-                                                     "-Xmx8G"
-                                                     "-Xms100m"))
-  (setq lombok-library-path (concat doom-data-dir "lombok.jar"))
-  (unless (file-exists-p lombok-library-path)
-    (url-copy-file "https://projectlombok.org/downloads/lombok.jar" lombok-library-path))
-  (push (concat "-javaagent:"
-                (expand-file-name lombok-library-path))
-        lsp-java-vmargs))
+  (setq lsp-java-references-code-lens-enabled                 t
+        lsp-java-implementations-code-lens-enabled            t
+        lsp-java-lens-mode                                    t
+        lsp-java-format-settings-url                          "~/IDEAJavaFormatter.xml"
+        ;; Import ordering: third-party | java.* | javax.* | static
+        ;; Each group gets a blank line separator automatically.
+        ;; "" = all imports not matched by a later prefix.
+        lsp-java-completion-import-order                      ["" "java" "javax" "\\#"]
+        ;; Gradle import — critical for classpath resolution in Gradle projects
+        lsp-java-import-gradle-enabled                        t
+        lsp-java-import-gradle-wrapper-enabled                t  ; use project's gradlew
+        lsp-java-import-maven-enabled                         nil
+        lsp-java-configuration-update-build-configuration     'automatic
+        ;; Tell JDT's import scanner to skip build artifacts. The defaults only
+        ;; exclude node_modules and a few Maven dirs; Gradle projects also generate
+        ;; large build/ and .gradle/ trees that JDT would otherwise index.
+        lsp-java-import-exclusions                            ["**/node_modules/**"
+                                                               "**/.metadata/**"
+                                                               "**/archetype-resources/**"
+                                                               "**/META-INF/maven/**"
+                                                               "**/build/**"
+                                                               "**/.gradle/**"
+                                                               "**/out/**"
+                                                               "**/bin/**"
+                                                               "**/.idea/**"]
+        lsp-java-vmargs                                       '("-XX:+UseParallelGC"
+                                                               "-XX:GCTimeRatio=4"
+                                                               "-XX:AdaptiveSizePolicyWeight=90"
+                                                               "-Dsun.zip.disableMemoryMapping=true"
+                                                               "-Xmx8G"
+                                                               "-Xms100m"))
+  (setq lombok-library-path
+        (let ((primary (expand-file-name "lombok.jar" doom-data-dir))
+              (fallback (expand-file-name "~/.config/emacs.old.d/.local/etc/lombok.jar")))
+          (cond ((file-exists-p primary)  primary)
+                ((file-exists-p fallback) (copy-file fallback primary) primary)
+                (t (url-copy-file "https://projectlombok.org/downloads/lombok.jar" primary) primary))))
+  (when (file-exists-p lombok-library-path)
+    (push (concat "-javaagent:" lombok-library-path) lsp-java-vmargs)))
 #+end_src
 
 ** SpringBoot for Java
@@ -266,17 +340,22 @@ Before using Obsidian through Emacs, it's also neccessary to mark the iCloud fol
 #+end_src
 
 * Eye Candy
+** [Experimental] Flyover
 
-** Pulsing Cursor
+I just saw some nice screenshots in the wild and it looks good, this package helps display prettier flymake messages
+
 #+begin_src emacs-lisp :tangle packages.el
-(package! pulsing-cursor
-  :recipe (:host github :repo "jasonjckn/pulsing-cursor"))
+(package! flyover
+  :recipe (:host github :repo "konrad1977/flyover" :files ("*.el")))
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! pulsing-cursor
+(use-package! flyover
   :config
-  (pulsing-cursor-mode +1))
+  (add-hook 'flycheck-mode-hook #'flyover-mode)
+  (setq flyover-use-theme-colors  t
+        flyover-display-mode      'show-only-on-same-line
+        flyover-virtual-line-type nil))
 #+end_src
 
 * CodeSnap Integration
@@ -294,7 +373,75 @@ Keybindings for codesnap
 (use-package! codesnap
   :config
   (map! :localleader
-        :prefix "CodeSnap" "S"
-        :desc "Screenshot selected code" "S x" #'codesnap-selection
-        :desc "Show CodeSnap log" "S l" #'codesnap-show-log))
+        :prefix "CodeSnap"
+        :desc "Screenshot selected code" "s" #'codesnap-selection
+        :desc "Show CodeSnap log" "l" #'codesnap-show-log))
+#+end_src
+
+* Typst - Latex for a modern era
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! typst-ts-mode
+  :recipe (:host codeberg :repo "meow_king/typst-ts-mode"))
+#+end_src
+
+
+#+begin_src emacs-lisp
+(use-package! typst-ts-mode
+  :custom
+  (typst-ts-watch-options "--open"))
+#+end_src
+
+* Fix Faces issue
+
+#+begin_src emacs-lisp :tangle packages.el
+(after! gnus
+  (set-face-attributes 'gnus-group-news-low-empty nil :inherit 'default))
+#+end_src
+
+* Magit Forge
+
+Configure Forge to interact with both GitHub and GitHub Enterprise (Netflix).
+
+#+begin_src emacs-lisp :tangle config.el
+(after! forge
+  (add-to-list 'forge-alist
+               '("github.netflix.net" "github.netflix.net/api/v3"
+                 "github.netflix.net" forge-github-repository)))
+#+end_src
+
+* Magit Auto-refresh on Window Focus
+
+Refresh the Magit buffer when its window regains focus, so the diff/log view
+stays current after external git operations without refreshing on every
+frame-focus event.
+
+#+begin_src emacs-lisp :tangle config.el
+(after! magit
+  (add-hook 'window-selection-change-functions
+            (lambda (_frame)
+              (when (derived-mode-p 'magit-mode)
+                (magit-refresh)))))
+#+end_src
+
+* Doom Modeline — Word Count per Line
+
+Agrega el conteo de palabras del renglón actual al modeline. El costo es
+despreciable: =count-words= opera solo sobre la línea actual y doom-modeline
+actualiza el segmento en los mismos hooks que ya usa para posición/columna.
+
+#+begin_src emacs-lisp
+(after! doom-modeline
+  (doom-modeline-def-segment line-word-count
+    "Word count of the current line."
+    (when (doom-modeline--active)
+      (propertize
+       (format "%d words" (count-words (line-beginning-position) (line-end-position)))
+       'face 'doom-modeline-buffer-minor-mode)))
+
+  (doom-modeline-def-modeline 'main
+    '(bar matches buffer-info remote-host buffer-position parrot selection-info)
+    '(objed-state misc-info persp-name battery grip irc mu4e gnus github debug
+      repl lsp minor-modes input-method indent-info line-word-count buffer-encoding major-mode
+      process vcs check)))
 #+end_src

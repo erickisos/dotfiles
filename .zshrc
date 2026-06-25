@@ -9,21 +9,14 @@ HIST_STAMPS="%Y-%m-%d %H:%M:%S"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_name=""
-if [[ -d "$HOME/miniforge3" ]]; then
-    __conda_name="miniforge3"
-elif [[ -d "$HOME/mambaforge" ]]; then
-    __conda_name="mambaforge"
-fi
-
-__conda_setup="$('$HOME/${__conda_name}/bin/conda' 'shell.zsh' 'hook' 2>/dev/null)"
+__conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2>/dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "$HOME/${__conda_name}/etc/profile.d/conda.sh" ]; then
-        . "$HOME/${__conda_name}/etc/profile.d/conda.sh"
+    if [ -f "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" ]; then
+        . "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"
     else
-        export PATH="$HOME/${__conda_name}/bin:$PATH"
+        export PATH="/opt/homebrew/Caskroom/miniforge/base/bin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -31,7 +24,6 @@ unset __conda_setup
 
 autoload -Uz compinit
 compinit
-
 export PATH="/opt/homebrew/opt/icu4c/bin:$PATH"
 export PATH="/opt/homebrew/opt/icu4c/sbin:$PATH"
 export PATH="$HOME/bin:$PATH"
@@ -39,3 +31,14 @@ export PATH="$HOME/bin:$PATH"
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+export PATH="$PATH:/Users/erickisos/.cargo/bin"
+export PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export JIRA_API_TOKEN=

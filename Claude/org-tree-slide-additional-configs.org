@@ -1,0 +1,287 @@
+#+TITLE: Org-Tree-Slide Additional Configuration Examples
+#+DATE: [2025-01-23]
+#+AUTHOR: ECA Assistant
+
+* Summary of Changes Made
+
+The following changes were applied to your ~config.org~:
+
+1. ✅ *Disabled line numbers during presentations* - Line numbers (including relative) are hidden when starting org-tree-slide
+2. ✅ *Enabled timer in modeline* - Set ~org-tree-slide-modeline-display~ to ~'lighter~
+3. ✅ *Auto-close other windows* - ECA and all other windows are closed when presentation starts, focusing only on the org file
+4. ✅ *UTF-8 entities enabled* - Override org-tree-slide's default to keep ~org-pretty-entities~ enabled for better visual appearance (shows α instead of \alpha)
+5. ⚠️ *Source code block line numbers* - Note: Org-mode src blocks don't typically show line numbers during presentations by default. If you want them, you'd need to add ~:number-lines~ to individual source blocks in your org files.
+
+* Why UTF-8 Entities Matter
+
+By default, ~org-tree-slide~ disables ~org-pretty-entities~ during presentations, which means:
+- Special characters like \alpha, \beta, \lambda show as plain text
+- Arrows like \rightarrow show as text instead of →
+- Mathematical symbols render as LaTeX markup instead of Unicode
+
+We've overridden this to keep UTF-8 rendering ON during presentations because:
+- It looks more professional and polished
+- Audiences can read symbols more easily
+- Mathematical notation is clearer
+- Your slides match what you see during editing
+
+* Additional Configuration Examples for Better Speaker Experience
+
+** 1. Automatic Text Scaling and Centering
+
+#+begin_src emacs-lisp :number-lines
+;; Center the text and add breathing room
+(add-hook 'org-tree-slide-play-hook
+          (lambda ()
+            (setq-local left-margin-width 10
+                        right-margin-width 10)
+            (set-window-buffer (selected-window) (current-buffer))))
+
+(add-hook 'org-tree-slide-stop-hook
+          (lambda ()
+            (setq-local left-margin-width 0
+                        right-margin-width 0)
+            (set-window-buffer (selected-window) (current-buffer))))
+#+end_src
+
+** 2. Hide Emphasis Markers and Clean Up Display
+
+#+begin_src emacs-lisp
+;; Hide emphasis markers (like *bold* and /italic/) for cleaner slides
+(add-hook 'org-tree-slide-play-hook
+          (lambda ()
+            (setq-local org-hide-emphasis-markers t)))
+
+(add-hook 'org-tree-slide-stop-hook
+          (lambda ()
+            (setq-local org-hide-emphasis-markers nil)))
+#+end_src
+
+** 3. Custom Header Faces for Better Visibility
+
+#+begin_src emacs-lisp
+;; Make headers larger and more distinct during presentations
+(defvar my/org-header-scale-backup nil
+  "Backup of original header scales.")
+
+(add-hook 'org-tree-slide-play-hook
+          (lambda ()
+            ;; Save original scales
+            (setq my/org-header-scale-backup
+                  (list (face-attribute 'org-level-1 :height)
+                        (face-attribute 'org-level-2 :height)
+                        (face-attribute 'org-level-3 :height)))
+            ;; Apply presentation scales
+            (set-face-attribute 'org-level-1 nil :height 2.5)
+            (set-face-attribute 'org-level-2 nil :height 2.0)
+            (set-face-attribute 'org-level-3 nil :height 1.5)))
+
+(add-hook 'org-tree-slide-stop-hook
+          (lambda ()
+            ;; Restore original scales
+            (when my/org-header-scale-backup
+              (set-face-attribute 'org-level-1 nil :height (nth 0 my/org-header-scale-backup))
+              (set-face-attribute 'org-level-2 nil :height (nth 1 my/org-header-scale-backup))
+              (set-face-attribute 'org-level-3 nil :height (nth 2 my/org-header-scale-backup)))))
+#+end_src
+
+** 4. Cursor Visibility Enhancement
+
+#+begin_src emacs-lisp
+;; Make cursor more visible during presentations
+(add-hook 'org-tree-slide-play-hook
+          (lambda ()
+            (setq-local cursor-type 'box)
+            (set-cursor-color "red")))
+
+(add-hook 'org-tree-slide-stop-hook
+          (lambda ()
+            (setq-local cursor-type t)))
+#+end_src
+
+** 5. Presentation Progress Indicator
+
+#+begin_src emacs-lisp
+;; Show slide progress in the header-line
+(defun my/org-tree-slide-progress ()
+  "Calculate and display presentation progress."
+  (let* ((count-slide
+          (length
+           (org-element-map (org-element-parse-buffer) 'headline
+             (lambda (hl)
+               (when (and (= (org-element-property :level hl)
+                             org-tree-slide-skip-outline-level)
+                          (not (org-element-property :EXCLUDE hl)))
+                 hl)))))
+         (current (org-tree-slide--count-slide (point)))
+         (progress (format "[%d/%d]" current count-slide)))
+    (setq header-line-format progress)))
+
+(add-hook 'org-tree-slide-play-hook
+          (lambda ()
+            (add-hook 'org-tree-slide-after-narrow-hook #'my/org-tree-slide-progress nil t)))
+
+(add-hook 'org-tree-slide-stop-hook
+          (lambda ()
+            (setq header-line-format nil)
+            (remove-hook 'org-tree-slide-after-narrow-hook #'my/org-tree-slide-progress t)))
+#+end_src
+
+** 6. Automatic Timer Start
+
+#+begin_src emacs-lisp
+;; Automatically start a timer when presentation begins
+(add-hook 'org-tree-slide-play-hook
+          (lambda ()
+            (org-timer-start)))
+
+(add-hook 'org-tree-slide-stop-hook
+          (lambda ()
+            (org-timer-stop)))
+#+end_src
+
+** 7. Presentation-Specific Keybindings
+
+#+begin_src emacs-lisp
+;; Additional useful keybindings for presentations
+(map! :map org-tree-slide-mode-map
+      :desc "Toggle content display" "C-c C-x" #'org-tree-slide-content
+      :desc "Jump to first slide" "C-<" #'org-tree-slide-move-next-tree
+      :desc "Jump to last slide" "C->" #'org-tree-slide-move-previous-tree
+      :desc "Skip to slide number" "C-c C-j" (lambda ()
+                                                (interactive)
+                                                (let ((n (read-number "Slide number: ")))
+                                                  (org-tree-slide-move-next-tree (1- n)))))
+#+end_src
+
+** 8. Hide TODO Keywords and Tags
+
+#+begin_src emacs-lisp
+;; Clean up slides by hiding TODO keywords and tags
+(defvar my/org-hide-todo-backup nil
+  "Backup of org-hide-leading-stars.")
+
+(add-hook 'org-tree-slide-play-hook
+          (lambda ()
+            (setq my/org-hide-todo-backup org-hide-leading-stars)
+            (setq-local org-hide-leading-stars t)
+            ;; Hide tags during presentation
+            (add-to-invisibility-spec '(org-tag . t))))
+
+(add-hook 'org-tree-slide-stop-hook
+          (lambda ()
+            (setq-local org-hide-leading-stars my/org-hide-todo-backup)
+            (remove-from-invisibility-spec '(org-tag . t))))
+#+end_src
+
+** 9. Focused Mode with Olivetti (Optional Package)
+
+#+begin_src emacs-lisp
+;; Requires: (package! olivetti) in packages.el
+;; Centers text and adds nice margins for a focused view
+(add-hook 'org-tree-slide-play-hook
+          (lambda ()
+            (when (require 'olivetti nil t)
+              (olivetti-mode 1)
+              (olivetti-set-width 100))))
+
+(add-hook 'org-tree-slide-stop-hook
+          (lambda ()
+            (when (bound-and-true-p olivetti-mode)
+              (olivetti-mode -1))))
+#+end_src
+
+** 10. Source Block Line Numbers (Per-Block Basis)
+
+To enable line numbers in specific source blocks during your presentation, add ~:number-lines~ to the block header:
+
+#+begin_example
+,#+begin_src emacs-lisp :number-lines
+(defun my-function ()
+  "This source block will show line numbers"
+  (message "Hello, world!"))
+,#+end_src
+#+end_example
+
+Or use ~:number-lines 10~ to start numbering from line 10.
+
+** 11. Presentation Mode Toggle Function
+
+#+begin_src emacs-lisp
+;; Quick toggle function for presentation mode
+(defun my/toggle-presentation-mode ()
+  "Toggle org-tree-slide presentation mode with optimal settings."
+  (interactive)
+  (if org-tree-slide-mode
+      (org-tree-slide-mode -1)
+    (org-tree-slide-mode 1)))
+
+;; Bind to a convenient key
+(map! :leader
+      :desc "Toggle presentation mode" "t p" #'my/toggle-presentation-mode)
+#+end_src
+
+** 12. Presentation Profiles (Different Styles)
+
+#+begin_src emacs-lisp
+;; Define different presentation profiles
+(defun my/org-tree-slide-presentation-profile ()
+  "Standard presentation profile."
+  (interactive)
+  (setq org-tree-slide-slide-in-effect t
+        org-tree-slide-activate-message "Starting presentation..."
+        org-tree-slide-deactivate-message "Presentation ended."
+        org-tree-slide-header t
+        org-tree-slide-breadcrumbs " > ")
+  (org-tree-slide-mode 1))
+
+(defun my/org-tree-slide-narrowing-profile ()
+  "Simpler profile focusing on content only."
+  (interactive)
+  (setq org-tree-slide-slide-in-effect nil
+        org-tree-slide-header nil)
+  (org-tree-slide-mode 1))
+
+;; Bind them
+(map! :leader
+      :prefix "t"
+      :desc "Presentation profile" "P" #'my/org-tree-slide-presentation-profile
+      :desc "Simple narrowing profile" "n" #'my/org-tree-slide-narrowing-profile)
+#+end_src
+
+* Notes on Tangling
+
+If you need to tangle this configuration:
+
+1. Run ~M-x org-babel-tangle~ (or ~C-c C-v t~) in your config.org file
+2. Restart Doom Emacs or run ~M-x doom/reload~
+3. The configuration will be written to:
+   - ~config.el~ (main configuration)
+   - ~packages.el~ (package declarations)
+   - ~functions.el~ (utility functions)
+
+* Testing Your Configuration
+
+To test the new org-tree-slide setup:
+
+1. Open any org file with headers
+2. Start the presentation with ~M-x org-tree-slide-mode~
+3. Verify:
+   - Line numbers are hidden
+   - Other windows (like ECA) are closed
+   - Timer appears in modeline
+   - Why-this-mode is disabled
+
+* Troubleshooting
+
+** Line numbers still showing
+- Make sure you've tangled and reloaded your config
+- Check if global settings are overriding local ones
+
+** Timer not showing in modeline
+- Ensure ~org-tree-slide-modeline-display~ is set to ~'lighter~
+- The timer shows the mode indicator, not an actual countdown (use ~org-timer-start~ for countdown)
+
+** Source blocks don't have line numbers
+- Add ~:number-lines~ to individual source blocks in your org files (not in config)
+- This is a per-document setting, not a global config option

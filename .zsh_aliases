@@ -1,1 +1,5 @@
 alias emacsc="emacsclient -c -a ''"
+alias yarn="newt exec yarn"
+alias npm="newt exec npm"
+alias cloud="cd ~/library/Mobile\ Documents/com~apple~CloudDocs"
+alias lem="$HOME/OpenSource/lem-project/lem/lem"

@@ -1,8 +1,16 @@
+##### BEGIN METATRON AUTOCONFIG
+# Do not remove the above line. The metatron CLI uses it to update this file.
+# Set git proxy configuration (must be the first directive in this file)
+[include]
+    path = /Users/erickisos/.gitconfig-proxy
+# Do not remove the below line. The metatron CLI uses it to update this file.
+##### END METATRON AUTOCONFIG
 [user]
-    name = Erick G. Islas-Osuna
-    email = erickisos653@gmail.com
+	name = Erick G. Islas-Osuna
+	email = erickisos653@gmail.com
 [core]
-    editor = nvim
+  editor = nvim
+  excludesfile = /Users/erickisos/.gitignore_global
 [github]
     user = erickisos
 
@@ -11,16 +19,21 @@
 [gpg]
     program = gpg
 [color]
-    branch = auto
-    status = auto
+  branch = auto
+  status = auto
 [alias]
-    nb = "!new_branch() { git checkout -b \"$1\" }; new_branch"
-    tree = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an, %cr)%Creset' --abbrev-commit --date=relative
-[url "git@github.com:"]
-    insteadOf = https://github.com/
+  nb = "!new_branch() { git checkout -b \"$1\" }; new_branch"
+  tree = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an, %cr)%Creset' --abbrev-commit --date=relative
+	migrate-package = "!f() { git checkout -b feat/v7-packages && git format-patch -k --stdout main...single-change-migration -- packages/* | git am -3 -k && git reset HEAD~1 --soft && newt exec npm run deps:fix && git status; }; f"
 [pull]
-    rebase = false
+  rebase = false
 [push]
-    default = simple
+  default = simple
 [init]
-	defaultBranch = main
+  defaultBranch = main
+[includeIf "gitdir:~/Documents/"]
+  path = ~/Documents/.gitconfig
+[credential "https://github.com"]
+  username = erickisos
+[credential]
+  helper = store
