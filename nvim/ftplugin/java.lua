@@ -20,7 +20,11 @@ local config = {
         "-configuration", mason_packages .. "/config_mac",
         "-data", workspace,
     },
-    root_dir = jdtls.setup.find_root({ ".git", "gradlew", "mvnw", "pom.xml", "build.gradle", "build.gradle.kts" }),
+    -- Check root-only markers first; only fall back to per-module build files
+    -- (build.gradle/pom.xml) if none of those are found anywhere upward, so
+    -- multi-module Gradle/Maven projects don't hoist to a submodule.
+    root_dir = jdtls.setup.find_root({ ".git", "gradlew", "mvnw", "settings.gradle", "settings.gradle.kts" })
+        or jdtls.setup.find_root({ "pom.xml", "build.gradle", "build.gradle.kts" }),
     settings = {
         java = {
             eclipse = { downloadSources = true },
