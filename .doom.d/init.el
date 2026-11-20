@@ -30,7 +30,7 @@
        :ui
        ;;deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
-       doom-dashboard    ; a nifty splash screen for Emacs
+       dashboard    ; a nifty splash screen for Emacs
        ;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
        (emoji +unicode)  ; 🙂
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
@@ -73,10 +73,11 @@
        vc                ; version-control and Emacs, sitting in a tree
 
        :term
-       eshell            ; the elisp shell that works everywhere
+       ;;eshell            ; the elisp shell that works everywhere
        ;;shell             ; simple shell REPL for Emacs
        ;;term              ; basic terminal emulator for Emacs
-       vterm             ; the best terminal emulation in Emacs
+       ;;vterm             ; the best terminal emulation in Emacs
+       ghostel
 
        :checkers
        (syntax +icons)              ; tasing you for every semicolon you forget
@@ -118,7 +119,7 @@
        ;;beancount         ; mind the GAAP
        (cc +lsp)         ; C > C++ == 1
        (clojure +lsp)           ; java with a lisp
-       common-lisp       ; if you've seen one lisp, you've seen them all
+       (common-lisp +tree-sitter)       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
        (csharp +lsp +dotnet +unity)     ; unity, .NET, and mono shenanigans
@@ -156,22 +157,19 @@
        nim               ; python + lisp at the speed of c
        ;;nix               ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
-       (org +brain
-            ;; +dragndrop
-            ;; +gnuplot
-            +journal
+       (org +journal
             +jupyter
-            ;; +noter
             +pandoc
             +pomodoro
             +present
             +pretty
-            +roam2)               ; organize your plain life in plain text
+            +roam)               ; organize your plain life in plain text
        ;;php               ; perl's insecure younger brother
        plantuml          ; diagrams for confusing people more
        graphviz          ; diagrams for confusing yourself even more
        ;; purescript        ; javascript, but functional
        (python +lsp
+               +uv
                +pyright
                +tree-sitter)            ; beautiful is better than ugly
        ;; qt                ; the 'cutest' gui framework ever
@@ -181,7 +179,7 @@
        ;; rst               ; ReST in peace
        ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
        (rust +tree-sitter +lsp)              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
-       (scala +lsp)             ; java, but good
+       ;; (scala +lsp)             ; java, but good
        (scheme +guile
                +racket)   ; a fully conniving family of lisps
        (sh +lsp)                ; she sells {ba,z,fi}sh shells on the C xor
@@ -189,9 +187,10 @@
        ;;solidity          ; do you need a blockchain? No.
        ;;swift             ; who asked for emoji variables?
        ;;terra             ; Earth and Moon in alignment for performance.
+       ;; (typst +tree-sitter +preview)
        (web +tree-sitter +lsp +css +html)               ; the tubes
        (yaml +lsp)              ; JSON, but readable
-       zig               ; C, but simpler
+       ;; zig               ; C, but simpler
 
        :email
        ;;(mu4e +org +gmail)

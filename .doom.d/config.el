@@ -36,6 +36,15 @@
 
 (use-package! po-mode
   :config
+  (global-font-lock-mode 1)  ; Ensure syntax highlighting is enabled
+  
+  ;; Customization for enhanced msgstr editing UX
+  ;; - po-subedit-use-split-window: Side-by-side view (msgid left, msgstr right)
+  ;;   Set to nil for pop-up buffer behavior (default: t)
+  ;; - po-subedit-center-msgid: Auto-center msgid in main window (default: t)
+  (setq po-subedit-use-split-window t    ; Enable split-window for better UX with long messages
+        po-subedit-center-msgid t)       ; Auto-center msgid for easy reference
+  
   (map! :map po-mode-map
         :localleader
         :desc "Go to next entry" "n" #'po-next-entry
@@ -46,6 +55,11 @@
         :desc "Prev untranslated entry" "U" #'po-previous-untranslated-entry
         :desc "Edit msgstr in separated buffer" "e" #'po-edit-msgstr))
 
+(use-package! ox-moderncv)
+
+(use-package! ox-typst
+  :after org)
+
 (use-package! org-tree-slide
   :after org
   :config
@@ -53,7 +67,7 @@
         +org-present-text-scale              2
         org-tree-slide-skip-outline-level    2
         org-tree-slide-fold-subtrees-skipped nil
-        org-tree-slide-modeline-display      'lighter ;; Show timer in modeline
+        org-tree-slide-modeline-display      'lighter 
         )
   
   ;; Disable line numbers, why-this-mode, and close unnecessary windows when starting presentation
@@ -85,7 +99,23 @@
         :desc "Next slide" "<right>" #'org-tree-slide-move-next-tree
         :desc "Prev slide" "<left>" #'org-tree-slide-move-previous-tree))
 
-(use-package! eca)
+;; (use-package! websocket
+;;     :after org-roam)
+
+;; (use-package! org-roam-ui
+;;   :after org-roam
+;;   :config
+;;   (setq org-roam-ui-sync-theme t
+;;         org-roam-ui-follow t
+;;         org-roam-ui-update-on-save t
+;;         org-roam-ui-open-on-start t))
+
+(use-package! eca
+  :config
+  ;; Point at a locally built eca (e.g. from `bb prod-cli` in
+  ;; ~/Documents/Github/eca) instead of the downloaded release binary, to
+  ;; test unreleased changes. Comment out to go back to the managed binary.
+  (setq eca-custom-command '("/Users/erickisos/Documents/Github/eca/eca" "server")))
 
 (use-package! claude-code-ide
   :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
@@ -96,10 +126,26 @@
   :commands lsp
   :config
   (setq lsp-headerline-breadcrumb-enable t
-        lsp-inlay-hints-mode             t
-        lsp-lens-enable                  t)
+        lsp-inlay-hint-enable            t
+        lsp-lens-enable                  t
+        lsp-idle-delay                   0.05
+        ;; Don't keep the JDT workspace alive after all its buffers are closed.
+        ;; Prevents every project you've ever opened from being re-imported on startup.
+        lsp-keep-workspace-alive         nil
+        ;; Emit a warning when the file watcher exceeds this many files — useful
+        ;; for diagnosing runaway scans into build artifact directories.
+        lsp-file-watch-threshold         2000)
   (advice-add #'lsp-rename
-              :after (lambda (&rest _) (projectile-save-project-buffers))))
+              :after (lambda (&rest _) (projectile-save-project-buffers)))
+  ;; Exclude Gradle/Java build artifact directories from the file watcher.
+  ;; Without this, lsp-mode watches build/, .gradle/, out/ etc. and triggers
+  ;; on every recompile, causing unnecessary re-indexing.
+  (dolist (dir '("[/\\\\]build\\'"
+                 "[/\\\\]\\.gradle\\'"
+                 "[/\\\\]out\\'"
+                 "[/\\\\]\\.idea\\'"
+                 "[/\\\\]bin\\'"))
+    (add-to-list 'lsp-file-watch-ignored-directories dir)))
 
 (after! lsp-mode
   :config
@@ -110,26 +156,57 @@
 (use-package! gradle-mode
   :after java-mode)
 
+(after! projectile
+  (add-to-list 'projectile-project-root-files-bottom-up "settings.gradle")
+  (add-to-list 'projectile-project-root-files-bottom-up "settings.gradle.kts")
+  ;; build.gradle exists in every Gradle submodule, so it's a false root signal.
+  ;; Remove it so submodules like app/ don't get detected as independent projects.
+  (setq projectile-project-root-files-bottom-up
+        (remove "build.gradle" projectile-project-root-files-bottom-up)))
+
 (use-package! lsp-java
   :after java-mode
   :config
   (add-hook 'java-mode-hook (lambda () (gradle-mode 1)))
-  (setq lsp-java-references-code-lens-enabled      t
-        lsp-java-implementations-code-lens-enabled t
-        lsp-java-lens-mode                         t
-        lsp-java-format-settings-url               "~/IDEAJavaFormatter.xml"
-        lsp-java-vmargs                            '("-XX:+UseParallelGC"
-                                                     "-XX:GCTimeRatio=4"
-                                                     "-XX:AdaptiveSizePolicyWeight=90"
-                                                     "-Dsun.zip.disableMemoryMapping=true"
-                                                     "-Xmx8G"
-                                                     "-Xms100m"))
-  (setq lombok-library-path (concat doom-data-dir "lombok.jar"))
-  (unless (file-exists-p lombok-library-path)
-    (url-copy-file "https://projectlombok.org/downloads/lombok.jar" lombok-library-path))
-  (push (concat "-javaagent:"
-                (expand-file-name lombok-library-path))
-        lsp-java-vmargs))
+  (setq lsp-java-references-code-lens-enabled                 t
+        lsp-java-implementations-code-lens-enabled            t
+        lsp-java-lens-mode                                    t
+        lsp-java-format-settings-url                          "~/IDEAJavaFormatter.xml"
+        ;; Import ordering: third-party | java.* | javax.* | static
+        ;; Each group gets a blank line separator automatically.
+        ;; "" = all imports not matched by a later prefix.
+        lsp-java-completion-import-order                      ["" "java" "javax" "\\#"]
+        ;; Gradle import — critical for classpath resolution in Gradle projects
+        lsp-java-import-gradle-enabled                        t
+        lsp-java-import-gradle-wrapper-enabled                t  ; use project's gradlew
+        lsp-java-import-maven-enabled                         nil
+        lsp-java-configuration-update-build-configuration     'automatic
+        ;; Tell JDT's import scanner to skip build artifacts. The defaults only
+        ;; exclude node_modules and a few Maven dirs; Gradle projects also generate
+        ;; large build/ and .gradle/ trees that JDT would otherwise index.
+        lsp-java-import-exclusions                            ["**/node_modules/**"
+                                                               "**/.metadata/**"
+                                                               "**/archetype-resources/**"
+                                                               "**/META-INF/maven/**"
+                                                               "**/build/**"
+                                                               "**/.gradle/**"
+                                                               "**/out/**"
+                                                               "**/bin/**"
+                                                               "**/.idea/**"]
+        lsp-java-vmargs                                       '("-XX:+UseParallelGC"
+                                                               "-XX:GCTimeRatio=4"
+                                                               "-XX:AdaptiveSizePolicyWeight=90"
+                                                               "-Dsun.zip.disableMemoryMapping=true"
+                                                               "-Xmx8G"
+                                                               "-Xms100m"))
+  (setq lombok-library-path
+        (let ((primary (expand-file-name "lombok.jar" doom-data-dir))
+              (fallback (expand-file-name "~/.config/emacs.old.d/.local/etc/lombok.jar")))
+          (cond ((file-exists-p primary)  primary)
+                ((file-exists-p fallback) (copy-file fallback primary) primary)
+                (t (url-copy-file "https://projectlombok.org/downloads/lombok.jar" primary) primary))))
+  (when (file-exists-p lombok-library-path)
+    (push (concat "-javaagent:" lombok-library-path) lsp-java-vmargs)))
 
 (use-package! lsp-java-boot
   :after lsp-mode
@@ -159,10 +236,18 @@
   (global-why-this-mode))
 
 (use-package! flyover
+  :ensure t
   :config
   (add-hook 'flycheck-mode-hook #'flyover-mode)
+  (add-hook 'flymake-mode-hook #'flyover-mode)
   (setq flyover-use-theme-colors  t
         flyover-display-mode      'show-only-on-same-line
+        flyover-checkers '(flycheck flymake)
+        flyover-levels '(error warning info)
+        flyover-text-tint 'lighter
+        flyover-text-tint-percent 50
+        flyover-debounce-interval 0.2
+        flyover-cursor-debounce-interval 0.3
         flyover-virtual-line-type nil))
 
 (use-package! codesnap
@@ -176,17 +261,22 @@
   :custom
   (typst-ts-watch-options "--open"))
 
-(after! forge
-  (setq forge-alist
-        (append forge-alist
-                '(("github.netflix.net" "github.netflix.net/api/v3"
-                   "github.netflix.net" forge-github-repository)))))
+(after! gnus
+  (set-face-attributes 'gnus-group-news-low-empty nil :inherit 'default))
 
-(after! magit
-  (add-hook 'window-selection-change-functions
-            (lambda (_frame)
-              (when (derived-mode-p 'magit-mode)
-                (magit-refresh)))))
+(defun +magit-refresh-on-focus-h (&optional frame)
+    "Refresh the selected Magit buffer on window, buffer or frame focus changes."
+    (when (or frame (eq t (frame-focus-state)))
+      (with-selected-window (frame-selected-window frame)
+        (when (derived-mode-p 'magit-mode)
+          (magit-refresh)))))
+
+(use-package! magit
+  :defer t
+  :config
+  (add-hook 'window-selection-change-functions #'+magit-refresh-on-focus-h)
+  (add-hook 'window-buffer-change-functions #'+magit-refresh-on-focus-h)
+  (add-function :after after-focus-change-function #'+magit-refresh-on-focus-h))
 
 (after! doom-modeline
   (doom-modeline-def-segment line-word-count
@@ -201,3 +291,8 @@
     '(objed-state misc-info persp-name battery grip irc mu4e gnus github debug
       repl lsp minor-modes input-method indent-info line-word-count buffer-encoding major-mode
       process vcs check)))
+
+(use-package! uv-mode
+  :hook (python-mode . uv-mode-auto-activate-hook))
+
+;; (use-package! platformio-mode)

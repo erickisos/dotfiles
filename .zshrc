@@ -31,14 +31,50 @@ export PATH="$HOME/bin:$PATH"
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
-
+export OPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3
+export PATH="/opt/homebrew/opt/ncurses/bin:$PATH"
 export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
-export PATH="$PATH:/Users/erickisos/.cargo/bin"
-export PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
-export JIRA_API_TOKEN=
+
+# bun completions
+[ -s "/Users/erickisos/.bun/_bun" ] && source "/Users/erickisos/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+export PATH=/Users/erickisos/.bun/bin:/Users/erickisos/.pyenv/shims:/opt/homebrew/opt/ncurses/bin:/Users/erickisos/.sdkman/candidates/leiningen/current/bin:/Users/erickisos/.sdkman/candidates/java/current/bin:/Users/erickisos/bin:/opt/homebrew/opt/icu4c/sbin:/opt/homebrew/opt/icu4c/bin:/Users/erickisos//bin:/opt/homebrew/bin:/opt/homebrew/sbin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/usr/local/MacGPG2/bin:/Library/TeX/texbin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/erickisos/.nvm/versions/node/v16.14.0/bin:/Users/erickisos/.cargo/bin:/Users/erickisos/.emacs.d/bin:/Users/erickisos/.local/bin:/Users/erickisos/.dotnet/tools:/Users/erickisos/.roswell/bin
+
+export STM32_PRG_PATH=/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin
+
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/opt/homebrew/Cellar/glibmm/2.84.0/lib/pkgconfig"
+
+# Qt5
+export LDFLAGS="-L/opt/homebrew/opt/qt@5/lib $LDFLAGS"
+export CPPFLAGS="-I/opt/homebrew/opt/qt@5/include $CPPFLAGS"
+export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/qt@5/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+# OpenBLAS
+export LDFLAGS="-L/opt/homebrew/opt/openblas/lib $LDFLAGS"
+export CPPFLAGS="-I/opt/homebrew/opt/openblas/include $CPPFLAGS"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/openblas/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+# Bison
+export PATH="/opt/homebrew/opt/bison/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/bison/lib $LDFLAGS"
+
+# NCurses
+export LDFLAGS="-L/opt/homebrew/opt/ncurses/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/ncurses/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/ncurses/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+# Load Angular CLI autocompletion for interactive shells.
+if [[ $- == *i* ]]; then
+  source <(ng completion script)
+fi

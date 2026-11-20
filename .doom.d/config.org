@@ -62,27 +62,36 @@ Load the defined functions into main config.el
 * Packages
 
 #+begin_src emacs-lisp :tangle packages.el
-;; (unpin! treemacs)
-;; (unpin! lsp-treemacs)
-;; (unpin! lsp-ui)
-;; (unpin! lsp-mode)
+(unpin! treemacs)
+(unpin! lsp-treemacs)
+(unpin! lsp-ui)
+(unpin! lsp-mode)
 #+end_src
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! treemacs-all-the-icons)
 (package! scss-mode)
-(package! lsp-metals)
 #+end_src
 
 * Po Mode for Docs Translation
 #+begin_src emacs-lisp :tangle packages.el
 (package! po-mode
-  :recipe (:host github :repo "erickisos/po-mode" :files ("*.el" "Makefile")))
+  :recipe (:local-repo "~/Documents/Github/po-mode" :files ("*.el" "Makefile") :build (:not compile))
+  )
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package! po-mode
   :config
+  (global-font-lock-mode 1)  ; Ensure syntax highlighting is enabled
+  
+  ;; Customization for enhanced msgstr editing UX
+  ;; - po-subedit-use-split-window: Side-by-side view (msgid left, msgstr right)
+  ;;   Set to nil for pop-up buffer behavior (default: t)
+  ;; - po-subedit-center-msgid: Auto-center msgid in main window (default: t)
+  (setq po-subedit-use-split-window t    ; Enable split-window for better UX with long messages
+        po-subedit-center-msgid t)       ; Auto-center msgid for easy reference
+  
   (map! :map po-mode-map
         :localleader
         :desc "Go to next entry" "n" #'po-next-entry
@@ -100,6 +109,23 @@ Load the defined functions into main config.el
   :recipe (:host github :repo "erickisos/org-cv" :files ("*.el")))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package! ox-moderncv)
+#+end_src
+
+* Typst
+
+This is a Typst backend exporter for org mode
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! ox-typst
+  :recipe (:host github :repo "jmpunkt/ox-typst" :files ("*.el")))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! ox-typst
+  :after org)
+#+end_src
 
 * Tree Slide (Slideshow for Geeks?)
 
@@ -111,7 +137,7 @@ Load the defined functions into main config.el
         +org-present-text-scale              2
         org-tree-slide-skip-outline-level    2
         org-tree-slide-fold-subtrees-skipped nil
-        org-tree-slide-modeline-display      'lighter ;; Show timer in modeline
+        org-tree-slide-modeline-display      'lighter 
         )
   
   ;; Disable line numbers, why-this-mode, and close unnecessary windows when starting presentation
@@ -144,6 +170,28 @@ Load the defined functions into main config.el
         :desc "Prev slide" "<left>" #'org-tree-slide-move-previous-tree))
 #+end_src
 
+* Org Roam UI
+
+#+begin_src emacs-lisp :tangle packages.el
+(unpin! org-roam)
+(unpin! org)
+
+;; (package! org-roam-ui)
+#+end_src
+
+#+begin_src emacs-lisp
+;; (use-package! websocket
+;;     :after org-roam)
+
+;; (use-package! org-roam-ui
+;;   :after org-roam
+;;   :config
+;;   (setq org-roam-ui-sync-theme t
+;;         org-roam-ui-follow t
+;;         org-roam-ui-update-on-save t
+;;         org-roam-ui-open-on-start t))
+#+end_src
+
 * Github Copilot (ECA)
 
 This is the main config to enable ECA
@@ -154,7 +202,12 @@ This is the main config to enable ECA
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! eca)
+(use-package! eca
+  :config
+  ;; Point at a locally built eca (e.g. from `bb prod-cli` in
+  ;; ~/Documents/Github/eca) instead of the downloaded release binary, to
+  ;; test unreleased changes. Comment out to go back to the managed binary.
+  (setq eca-custom-command '("/Users/erickisos/Documents/Github/eca/eca" "server")))
 #+end_src
 
 * Claude Code support
@@ -171,15 +224,16 @@ This is the main config to enable ECA
   (claude-code-ide-emacs-tools-setup)) ; Optionally enable Emacs MCP tools
 #+end_src
 
-* * LSP Configurations
+* LSP Configurations
 
 #+begin_src emacs-lisp
 (use-package! lsp-mode
   :commands lsp
   :config
   (setq lsp-headerline-breadcrumb-enable t
-        lsp-inlay-hints-mode             t
+        lsp-inlay-hint-enable            t
         lsp-lens-enable                  t
+        lsp-idle-delay                   0.05
         ;; Don't keep the JDT workspace alive after all its buffers are closed.
         ;; Prevents every project you've ever opened from being re-imported on startup.
         lsp-keep-workspace-alive         nil
@@ -351,10 +405,18 @@ I just saw some nice screenshots in the wild and it looks good, this package hel
 
 #+begin_src emacs-lisp
 (use-package! flyover
+  :ensure t
   :config
   (add-hook 'flycheck-mode-hook #'flyover-mode)
+  (add-hook 'flymake-mode-hook #'flyover-mode)
   (setq flyover-use-theme-colors  t
         flyover-display-mode      'show-only-on-same-line
+        flyover-checkers '(flycheck flymake)
+        flyover-levels '(error warning info)
+        flyover-text-tint 'lighter
+        flyover-text-tint-percent 50
+        flyover-debounce-interval 0.2
+        flyover-cursor-debounce-interval 0.3
         flyover-virtual-line-type nil))
 #+end_src
 
@@ -394,34 +456,30 @@ Keybindings for codesnap
 
 * Fix Faces issue
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src emacs-lisp :tangle config.el
 (after! gnus
   (set-face-attributes 'gnus-group-news-low-empty nil :inherit 'default))
 #+end_src
 
-* Magit Forge
-
-Configure Forge to interact with both GitHub and GitHub Enterprise (Netflix).
-
-#+begin_src emacs-lisp :tangle config.el
-(after! forge
-  (add-to-list 'forge-alist
-               '("github.netflix.net" "github.netflix.net/api/v3"
-                 "github.netflix.net" forge-github-repository)))
-#+end_src
-
 * Magit Auto-refresh on Window Focus
 
-Refresh the Magit buffer when its window regains focus, so the diff/log view
-stays current after external git operations without refreshing on every
-frame-focus event.
+Refresh the selected Magit buffer when switching windows or buffers, or
+returning to Emacs after external git operations.
 
 #+begin_src emacs-lisp :tangle config.el
-(after! magit
-  (add-hook 'window-selection-change-functions
-            (lambda (_frame)
-              (when (derived-mode-p 'magit-mode)
-                (magit-refresh)))))
+(defun +magit-refresh-on-focus-h (&optional frame)
+    "Refresh the selected Magit buffer on window, buffer or frame focus changes."
+    (when (or frame (eq t (frame-focus-state)))
+      (with-selected-window (frame-selected-window frame)
+        (when (derived-mode-p 'magit-mode)
+          (magit-refresh)))))
+
+(use-package! magit
+  :defer t
+  :config
+  (add-hook 'window-selection-change-functions #'+magit-refresh-on-focus-h)
+  (add-hook 'window-buffer-change-functions #'+magit-refresh-on-focus-h)
+  (add-function :after after-focus-change-function #'+magit-refresh-on-focus-h))
 #+end_src
 
 * Doom Modeline — Word Count per Line
@@ -444,4 +502,21 @@ actualiza el segmento en los mismos hooks que ya usa para posición/columna.
     '(objed-state misc-info persp-name battery grip irc mu4e gnus github debug
       repl lsp minor-modes input-method indent-info line-word-count buffer-encoding major-mode
       process vcs check)))
+#+end_src
+
+* Python UV Config
+
+#+begin_src emacs-lisp
+(use-package! uv-mode
+  :hook (python-mode . uv-mode-auto-activate-hook))
+#+end_src
+
+* PlatformIO
+
+#+begin_src emacs-lisp :tangle packages.el
+;; (package! platformio-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+;; (use-package! platformio-mode)
 #+end_src
